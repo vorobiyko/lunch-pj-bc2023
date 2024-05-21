@@ -1,0 +1,33 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch",
+            "request": "launch",
+            "type": "al",
+            "server": "http://localhost:8080/BC230/",
+            "serverInstance": "BC230",
+            "port": 7049,
+            "authentication": "Windows",
+            "startupObjectId": 22,
+            "startupObjectType": "Page",
+            "breakOnError": true,
+            "launchBrowser": true,
+            "enableLongRunningSqlStatements": true,
+            "enableSqlInformationDebugger": true,
+            "schemaUpdateMode": "ForceSync"
+        },
+        {
+            "name": "AL: Generated Snapshot request",
+            "request": "snapshotInitialize",
+            "type": "al",
+            "server": "http://IVSHK",
+            "serverInstance": "BC230",
+            "authentication": "Windows",
+            "port": 7049,
+            "sessionId": 832,
+            "breakOnNext": "WebClient",
+            "executionContext": "DebugAndProfile"
+        }
+    ]
+}
