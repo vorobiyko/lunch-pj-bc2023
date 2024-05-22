@@ -4,7 +4,8 @@ page 60102 LunchMenuEdit
     ApplicationArea = All;
     UsageCategory = Lists;
     Caption = 'Lunch Menu Edit Page';
-    // SourceTable = TableName;
+    SourceTable = LunchMenu;
+    AutoSplitKey = true;
     
     layout
     {

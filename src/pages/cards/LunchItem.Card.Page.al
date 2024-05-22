@@ -4,20 +4,47 @@ page 60121 LunchItemCard
     ApplicationArea = All;
     UsageCategory = Administration;
     Caption = 'Lunch Item Card';
-    // SourceTable = TableName;
+    SourceTable = LunchItem;
     
     layout
     {
         area(Content)
         {
-            // group(GroupName)
-            // {
-            //     field(Name; NameSource)
-            //     {
-            //         ApplicationArea = All;
-                    
-            //     }
-            // }
+            group("Lunch Item")
+            {
+                 field("Vendor No."; Rec."Vendor No.")
+                {
+                    ApplicationArea = All;
+                }
+                field("Item No."; Rec."Item No.")
+                {
+                    ApplicationArea = All;
+                }
+                field("Description"; Rec.Description)
+                {
+                    ApplicationArea = All;
+                }
+                field("Weight"; Rec.Weight)
+                {
+                    ApplicationArea = All;
+                }
+                field("Price"; Rec.Price)
+                {
+                    ApplicationArea = All;
+                }
+                field("Picture"; Rec.Picture)
+                {
+                    ApplicationArea = All;
+                }
+                field("Info Link"; Rec."Info Link")
+                {
+                    ApplicationArea = All;
+                }
+                field("Self-Order"; Rec."Self-Order")
+                {
+                    ApplicationArea = All;
+                }
+            }
         }
     }
     
