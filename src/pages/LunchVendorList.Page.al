@@ -4,27 +4,36 @@ page 60104 LunchVendorList
     ApplicationArea = All;
     UsageCategory = Lists;
     Caption = 'Lunch Vendor List Page';
-    // SourceTable = TableName;
-    
+    SourceTable = LunchVendorTable;
+
     layout
     {
         area(Content)
         {
-            // repeater(GroupName)
-            // {
-            //     field(Name; NameSource)
-            //     {
-            //         ApplicationArea = All;
-                    
-            //     }
-            // }
+            repeater(LunchVendor)
+            {
+                field("Vendor No."; Rec."Vendor No.")
+                {
+                    ApplicationArea = All;
+                   
+                  
+                }
+                field("Company"; Rec.Company)
+                {
+                    ApplicationArea = All;
+                   
+                }
+
+            }
         }
         area(Factboxes)
         {
-            
+
         }
+        
+        
     }
-    
+
     actions
     {
         area(Processing)
@@ -32,10 +41,10 @@ page 60104 LunchVendorList
             action(ActionName)
             {
                 ApplicationArea = All;
-                
+
                 trigger OnAction()
                 begin
-                    
+
                 end;
             }
         }

@@ -4,20 +4,21 @@ page 60124 LunchVendorCard
     ApplicationArea = All;
     UsageCategory = Administration;
     Caption = 'Lunch Vendor Card';
+    SourceTable = LunchVendorTable;
     
     
     layout
     {
         area(Content)
         {
-            // group(GroupName)
-            // {
-            //     field(Name; NameSource)
-            //     {
-            //         ApplicationArea = All;
-                    
-            //     }
-            // }
+            group(GroupName)
+            {
+                field(Company; Rec."Company")
+                {
+                    ApplicationArea = All;
+                    Editable = true;
+                }
+            }
         }
     }
     
