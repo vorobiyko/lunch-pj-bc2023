@@ -1,43 +1,54 @@
 page 60124 LunchVendorCard
 {
     PageType = Card;
-    ApplicationArea = All;
-    UsageCategory = Administration;
+    UsageCategory = None;
     Caption = 'Lunch Vendor Card';
     SourceTable = LunchVendorTable;
+
     
     
     layout
     {
         area(Content)
         {
-            group(GroupName)
+            group(Genral)
             {
-                field(Company; Rec."Company")
+                Caption = 'General';
+                field("Vendor No."; Rec."Vendor No.")
                 {
                     ApplicationArea = All;
-                    Editable = true;
+                    ToolTip = 'Specifies the value of the No. field.';
+                    trigger OnAssistEdit()
+                     begin
+                         if Rec.AssistEdit(xRec) then
+                             CurrPage.Update();
+                     end;
+                }
+                field("Company"; Rec."Company")
+                {
+                    ApplicationArea = All;
+                
                 }
             }
         }
     }
     
-    actions
-    {
-        area(Processing)
-        {
-            action(ActionName)
-            {
-                ApplicationArea = All;
+    // actions
+    // {
+    //     area(Processing)
+    //     {
+    //         action(ActionName)
+    //         {
+    //             ApplicationArea = All;
                 
-                trigger OnAction()
-                begin
+    //             trigger OnAction()
+    //             begin
                     
-                end;
-            }
-        }
-    }
+    //             end;
+    //         }
+    //     }
+    // }
     
-    var
-        myInt: Integer;
+    // var
+    //     myInt: Integer;
 }

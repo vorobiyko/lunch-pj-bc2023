@@ -5,6 +5,8 @@ page 60101 LunchItemList
     UsageCategory = Lists;
     Caption = 'Lunch Item List Page';
     SourceTable = LunchItem;
+    CardPageId = "LunchItemCard";
+    Editable = false;
 
     layout
     {
