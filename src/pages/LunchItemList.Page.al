@@ -1,4 +1,4 @@
-page 60101 LunchItemList
+page 60122 LunchItemList
 {
     PageType = List;
     ApplicationArea = All;
@@ -48,25 +48,25 @@ page 60101 LunchItemList
                 }
             }
         }
-        area(Factboxes)
-        {
+        // area(Factboxes)
+        // {
 
-        }
+        // }
     }
 
-    actions
-    {
-        area(Processing)
-        {
-            action(ActionName)
-            {
-                ApplicationArea = All;
+    // actions
+    // {
+    //     area(Processing)
+    //     {
+    //         action(ActionName)
+    //         {
+    //             ApplicationArea = All;
 
-                trigger OnAction()
-                begin
+    //             trigger OnAction()
+    //             begin
 
-                end;
-            }
-        }
-    }
+    //             end;
+    //         }
+    //     }
+    // }
 }

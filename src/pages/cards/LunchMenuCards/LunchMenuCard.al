@@ -1,26 +1,30 @@
-page 60102 LunchMenuEdit
+page 60132 LunchMenuCard
 {
-    PageType = List;
+    PageType = Card;
     ApplicationArea = All;
-    UsageCategory = Lists;
-    Caption = 'Lunch Menu Edit Page';
+    UsageCategory = Administration;
     SourceTable = LunchMenu;
-    CardPageId = LunchMenuCard;
-    Editable = true;
     AutoSplitKey = true;
 
     layout
     {
         area(Content)
         {
-            repeater("Lunch Menu Edt")
+            group(General)
             {
+                Caption = 'MenuCard';
                 field("Vendor No."; Rec."Vendor No.")
                 {
                     ApplicationArea = All;
-                    Caption = 'Vendor No.'; 
+                    Caption = 'Vendor No.';
+                    Editable = true;
+                    NotBlank = true;
+                    trigger OnValidate()
+                    begin
+                        EditableFieldsControl();
+                    end;
                 }
-                 field("Line Type"; Rec."Line Type")
+                field("Line Type"; Rec."Line Type")
                 {
                     ApplicationArea = all;
                     Caption = 'Line Type';
@@ -29,19 +33,20 @@ page 60102 LunchMenuEdit
                 {
                     ApplicationArea = All;
                     Caption = 'Line No.';
-                    Editable = false;
+                    Editable= false;
                 }
                 field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Item No.';
+                    Editable = isActive;
                 }
                 field("Item Description"; Rec."Item Description")
                 {
                     ApplicationArea = All;
                     Caption = 'Item Description';
-                    Editable = false;
-                    Enabled = false;
+                    Editable = true;
+                    Enabled = true;
                 }
                 field("Weight"; Rec."Weight")
                 {
@@ -82,7 +87,7 @@ page 60102 LunchMenuEdit
                     ApplicationArea = all;
                     Caption = 'Order Amount';
                 }
-               
+
                 // field("Previous Quantity"; Rec."Previous Quantity")
                 // {
                 //     ApplicationArea = all;
@@ -107,43 +112,21 @@ page 60102 LunchMenuEdit
                 // }
             }
         }
-        area(Factboxes)
-        {
-
-        }
     }
-    
-    
-
-    // actions
-    // {
-    //     area(Processing)
-    //     {
-    //         action(ActionName)
-    //         {
-    //             ApplicationArea = All;
-
-    //             trigger OnAction()
-    //             begin
-
-    //             end;
-    //         }
-    //     }
-    // }
-    trigger OnOpenPage()
-    var 
-        menuTableExp: Record LunchMenu;
-        optionCompaire: Option "Heading";
-        // dataQuery: Query "LunchMenu";
+    var isActive: Boolean;
+     trigger OnOpenPage() 
     begin
-        if rec.IsEmpty then begin
-
-        //   menuTableExp."Item Description" := 'Heading';
-          Rec."Line Type" := Rec."Line Type"::"Group";
-          Rec.Insert();
-         
-        //   CurrPage.Update();
-          
-        end; 
+        if Rec."Vendor No." = '' then begin
+            isActive:= false;  
+        end else begin
+            isActive:= true;
+        end;  
+        CurrPage.Update(); 
     end;
+    procedure EditableFieldsControl()
+    begin
+        isActive:= true;
+        CurrPage.Update();
+    end;
+
 }

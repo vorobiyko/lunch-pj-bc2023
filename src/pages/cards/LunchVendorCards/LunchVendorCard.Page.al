@@ -17,6 +17,7 @@ page 60124 LunchVendorCard
                 field("Vendor No."; Rec."Vendor No.")
                 {
                     ApplicationArea = All;
+                    Editable = false;
                     ToolTip = 'Specifies the value of the No. field.';
                     trigger OnAssistEdit()
                      begin

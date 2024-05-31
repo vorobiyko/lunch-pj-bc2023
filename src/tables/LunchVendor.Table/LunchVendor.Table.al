@@ -11,12 +11,6 @@ table 60104 LunchVendorTable
         {   
             DataClassification = CustomerContent;
             Caption = 'Vendor No.';
-            // NotBlank = true;
-            // TableRelation = "No. Series";
-            // trigger OnValidate()
-            // begin
-                
-            // end;
 
         }
      

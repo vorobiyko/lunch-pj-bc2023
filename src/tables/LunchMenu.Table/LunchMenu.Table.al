@@ -2,50 +2,63 @@ table 60102 LunchMenu
 {
     DataClassification = CustomerContent;
     Caption = 'Lunch Menu Table';
-
+    DrillDownPageID = LunchMenuEdit;
+    LookupPageID = LunchMenuEdit;
+    
     fields
     {
         field(1; "Vendor No."; Code[20])
-        {
-            DataClassification = CustomerContent;
+        {      
+            TableRelation = LunchVendorTable;
             Caption = 'Vendor No.';
-            TableRelation = LunchVendorTable."Vendor No.";
-            // Link to Vendor table
-            NotBlank = true;
+             DataClassification = CustomerContent;
+            ValidateTableRelation = false;
+        
+            // FieldClass = FlowField;
+            // CalcFormula = Lookup("LunchItem"."Vendor No." WHERE ("Item No."=FIELD("Item No.")));
         }
-        field(2; "Menu Date"; Date)
-        {
-            DataClassification = CustomerContent;
-            Caption = 'Menu Date';
-        }
+        // field(2; "Menu Date"; Date)
+        // {
+        //     DataClassification = CustomerContent;
+        //     Caption = 'Menu Date';
+        //     InitValue:= 
+        // }
         field(3; "Line No."; Integer)
         {
             DataClassification = CustomerContent;
             Caption = 'Line No.';
-
+            
+           
         }
         field(4; "Item No."; Code[20])
         {
             DataClassification = CustomerContent;
             Caption = 'Item No.';
-            TableRelation = LunchItem;
-            NotBlank = true;
+            TableRelation = LunchItem where ("Vendor No." = field("Vendor No."));
+            trigger OnValidate()
+            var LunchItemState: Record LunchItem;
+            begin
+                if LunchItemState.Get("Item No.") then begin
+                    Rec."Item Description":= LunchItemState.Description;
+                end;
+            end;
         }
         field(5; "Item Description"; Text[250])
         {
-            DataClassification = CustomerContent;
             Caption = 'Item Description';
+            DataClassification = CustomerContent;
         }
         field(6; "Weight"; Decimal)
         {
-            DataClassification = CustomerContent;
             Caption = 'Weight';
-            MinValue = 0;
+            FieldClass = FlowField;
+            CalcFormula = Lookup("LunchItem".Weight WHERE ("Item No."=FIELD("Item No.")));
         }
         field(7; "Price"; Decimal)
         {
-            DataClassification = CustomerContent;
             Caption = 'Price';
+            FieldClass = FlowField;
+            CalcFormula = Lookup("LunchItem".Price WHERE ("Item No."=FIELD("Item No.")));
         }
         field(8; "Indentation"; Integer)
         {
@@ -81,67 +94,36 @@ table 60102 LunchMenu
             Caption = 'Line Type';
             OptionMembers = "Item","Group","Heading";
         }
-        field(14; "Previous Quantity"; Decimal)
-        {
-            Caption = 'Previous Quantity';
-            FieldClass = FlowField;
-            MinValue = 0;
+        // field(14; "Previous Quantity"; Decimal)
+        // {
+        //     Caption = 'Previous Quantity';
+        //     FieldClass = FlowField;
+        //     MinValue = 0;
             // CalcFormula = Sum("LunchOrderEntry".Quantity WHERE ("Menu Item Entry No."=FIELD("Menu Item Entry No.")));
-        }
+        // }
         field(15; "Self-Order"; Boolean)
         {
-            DataClassification = CustomerContent;
             Caption = 'Self-Order';
+            FieldClass = FlowField;
+            CalcFormula = Lookup("LunchItem"."Self-Order" WHERE ("Item No."=FIELD("Item No.")));
         }
         field(16; "Parent Menu Item Entry No."; Integer)
         {
             DataClassification = CustomerContent;
             Caption = 'Parent Menu Item Entry No.';
         }
+        
     }
+    
 
     keys
     {
-        key(PK; "Vendor No.")
+        key(PK;"Vendor No.", "Line No.")
         {
             Clustered = true;
         }
-        key(MenuDateKey; "Menu Date")
-        {
-
-        }
-        key(LineNoKey; "Line No.")
-        {
-
-        }
     }
-
-    // fieldgroups
-    // {
-    //     // Add changes to field groups here
-    // }
-
-    // var
-    //     myInt: Integer;
-
-    // trigger OnInsert()
-    // begin
-
-    // end;
-
-    // trigger OnModify()
-    // begin
-
-    // end;
-
-    // trigger OnDelete()
-    // begin
-
-    // end;
-
-    // trigger OnRename()
-    // begin
-
-    // end;
+    
+    
 
 }

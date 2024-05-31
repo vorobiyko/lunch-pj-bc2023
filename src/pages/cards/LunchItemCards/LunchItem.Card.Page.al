@@ -1,8 +1,7 @@
 page 60121 LunchItemCard
 {
     PageType = Card;
-    ApplicationArea = All;
-    UsageCategory = Administration;
+    UsageCategory = None;
     Caption = 'Lunch Item Card';
     SourceTable = LunchItem;
     
@@ -19,6 +18,14 @@ page 60121 LunchItemCard
                 field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the No. field.';
+                    Editable = false;
+                    trigger OnAssistEdit()
+                     begin
+                         if Rec.AssistEdit(xRec) then
+                             CurrPage.Update();
+                     end;
+                    
                 }
                 field("Description"; Rec.Description)
                 {
@@ -48,22 +55,22 @@ page 60121 LunchItemCard
         }
     }
     
-    actions
-    {
-        area(Processing)
-        {
-            action(ActionName)
-            {
-                ApplicationArea = All;
+    // actions
+    // {
+    //     area(Processing)
+    //     {
+    //         action(ActionName)
+    //         {
+    //             ApplicationArea = All;
                 
-                trigger OnAction()
-                begin
+    //             trigger OnAction()
+    //             begin
                     
-                end;
-            }
-        }
-    }
+    //             end;
+    //         }
+    //     }
+    // }
     
-    var
-        myInt: Integer;
+    // var
+    //     myInt: Integer;
 }
