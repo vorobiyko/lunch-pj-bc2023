@@ -18,7 +18,7 @@ page 60132 LunchMenuCard
                     ApplicationArea = All;
                     Caption = 'Vendor No.';
                     Editable = true;
-                    NotBlank = true;
+                    // ShowMandatory = IsGroup;
                     trigger OnValidate()
                     begin
                         EditableFieldsControl();
@@ -33,7 +33,7 @@ page 60132 LunchMenuCard
                 {
                     ApplicationArea = All;
                     Caption = 'Line No.';
-                    Editable= false;
+                    Editable = false;
                 }
                 field("Item No."; Rec."Item No.")
                 {
@@ -62,6 +62,7 @@ page 60132 LunchMenuCard
                     Editable = false;
                     Enabled = false;
                 }
+
                 field("Indentation"; Rec."Indentation")
                 {
                     ApplicationArea = All;
@@ -105,28 +106,32 @@ page 60132 LunchMenuCard
                     ApplicationArea = all;
                     Caption = 'Parent Menu Item Entry No.';
                 }
-                // field("Menu Date"; Rec."Menu Date")
-                // {
-                //     ApplicationArea = All;
-                //     Caption = 'Menu Date';
-                // }
+                field("Menu Date"; Rec."Menu Date")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Menu Date';
+                }
             }
         }
     }
-    var isActive: Boolean;
-     trigger OnOpenPage() 
+    var
+        isActive: Boolean;
+
+    trigger OnOpenPage()
     begin
         if Rec."Vendor No." = '' then begin
-            isActive:= false;  
+            isActive := false;
         end else begin
-            isActive:= true;
-        end;  
-        CurrPage.Update(); 
-    end;
-    procedure EditableFieldsControl()
-    begin
-        isActive:= true;
+            isActive := true;
+        end;
         CurrPage.Update();
     end;
 
+    procedure EditableFieldsControl()
+    begin
+        isActive := true;
+        CurrPage.Update();
+    end;
+    
+    
 }
