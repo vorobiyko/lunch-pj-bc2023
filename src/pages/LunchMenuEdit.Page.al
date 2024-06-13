@@ -6,22 +6,34 @@ page 60102 LunchMenuEdit
     Caption = 'Lunch Menu Edit Page';
     SourceTable = LunchMenu;
     CardPageId = LunchMenuCard;
-    Editable = false;
+    Editable = true;
     AutoSplitKey = true;
+    RefreshOnActivate = true;
+
 
     layout
     {
         area(Content)
         {
-            repeater("Lunch Menu Edt")
+            repeater("Lunch Menu Edit")
             {
-
                 IndentationColumn = Rec."Indentation";
-                IndentationControls = "Indentation";
+                IndentationControls = "Line Type", "Line No.";
+                field("Line No."; Rec."Line No.")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Line No.';
+                    Editable = false;
+                }
                 field("Vendor No."; Rec."Vendor No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Vendor No.';
+                }
+                field("Item No."; Rec."Item No.")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Item No.';
                 }
                 field("Line Type"; Rec."Line Type")
                 {
@@ -29,17 +41,6 @@ page 60102 LunchMenuEdit
                     Caption = 'Line Type';
                     StyleExpr = TypeControl;
 
-                }
-                field("Line No."; Rec."Line No.")
-                {
-                    ApplicationArea = All;
-                    Caption = 'Line No.';
-                    Editable = false;
-                }
-                field("Item No."; Rec."Item No.")
-                {
-                    ApplicationArea = All;
-                    Caption = 'Item No.';
                 }
                 field("Item Description"; Rec."Item Description")
                 {
@@ -66,6 +67,7 @@ page 60102 LunchMenuEdit
                 {
                     ApplicationArea = All;
                     Caption = 'Indentation';
+                    Visible = false;
                 }
                 field("Menu Item Entry No."; Rec."Menu Item Entry No.")
                 {
@@ -76,6 +78,7 @@ page 60102 LunchMenuEdit
                 {
                     ApplicationArea = all;
                     Caption = 'Active';
+                    Visible =false;
                 }
                 field("Order Quantity"; Rec."Order Quantity")
                 {
@@ -136,29 +139,21 @@ page 60102 LunchMenuEdit
         }
 
     }
-    // trigger OnOpenPage()
 
-    // begin
-    //     if rec.IsEmpty then begin
-    //         Rec."Line Type" := Rec."Line Type"::"Group";
-    //         Rec.Insert();
-    //     end;
-
-
-    // end;
 
     var
         TypeControl: Text;
 
     procedure GropeContol()
-
+    
     begin
-        // while Rec."Line Type" = Rec."Line Type"::Item do begin
-
+       
         case Rec."Line Type" of
             Rec."Line Type"::"Group":
                 begin
                     TypeControl := 'Strong';
+                    if (GetCurrentLineNo = Rec."Line No.") then
+                        Rec.Weight := 20.0;
 
 
                 end;
@@ -171,21 +166,27 @@ page 60102 LunchMenuEdit
                 TypeControl := 'Standart';
             end;
         end;
-        // end; 
     end;
 
-    // procedure Group2ItemLinked()
-    // var
-    //     GroupNumber: Integer;
-    // begin
-    //    Rec.
-    // end;
-
+    procedure GetCurrentLineNo(): Integer
+    var BufferRecTable: Record "LunchMenuSystem";
+    begin
+        if BufferRecTable.FindLast() then
+        repeat
+            exit(BufferRecTable."Line No.");
+        until BufferRecTable.Next() = 0;
+        
+    end;
+    trigger OnOpenPage()
+    begin
+        Rec.SetCurrentKey("Line No.");
+        Rec.SetAscending("Line No.", false);
+    end;
     trigger OnAfterGetRecord()
-     var myList: List of [Integer];
     begin
         GropeContol();
     end;
+
 
 
 }
