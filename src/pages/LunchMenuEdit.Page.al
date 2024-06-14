@@ -55,6 +55,7 @@ page 60102 LunchMenuEdit
                     Caption = 'Weight';
                     Editable = false;
                     Enabled = false;
+                    
                 }
                 field("Price"; Rec."Price")
                 {
@@ -143,39 +144,42 @@ page 60102 LunchMenuEdit
 
     var
         TypeControl: Text;
+        
 
     procedure GropeContol()
+    var ExRecStatus: Record LunchMenu;
     
     begin
-       
-        case Rec."Line Type" of
-            Rec."Line Type"::"Group":
+       ExRecStatus:= Rec;
+        case ExRecStatus."Line Type" of
+            ExRecStatus."Line Type"::"Group":
                 begin
                     TypeControl := 'Strong';
-                    if (GetCurrentLineNo = Rec."Line No.") then
-                        Rec.Weight := 20.0;
-
-
-                end;
-            Rec."Line Type"::"Item":
-                begin
-                    TypeControl := 'Standart';
-
                 end;
             else begin
                 TypeControl := 'Standart';
             end;
         end;
     end;
-
-    procedure GetCurrentLineNo(): Integer
-    var BufferRecTable: Record "LunchMenuSystem";
+     procedure SumParams()
+    var ExRecSum: Record LunchMenu;
+        RecordGroup: Record LunchMenu;
+        TotalItemsPrice: Decimal;
+        TotalItemsWeight: Decimal;
     begin
-        if BufferRecTable.FindLast() then
-        repeat
-            exit(BufferRecTable."Line No.");
-        until BufferRecTable.Next() = 0;
-        
+        ExRecSum:= Rec;
+        ExRecSum.SetCurrentKey("Line No.");
+            if ExRecSum."Line Type" = ExRecSum."Line Type"::Group then begin
+                RecordGroup:= ExRecSum;
+                ExRecSum.SetRange("Parent Menu Item Entry No.", RecordGroup."Menu Item Entry No.");
+                repeat
+                    TotalItemsPrice := ExRecSum.Price + TotalItemsPrice;
+                    TotalItemsWeight := ExRecSum.Weight + TotalItemsWeight;
+                until ExRecSum.Next() = 0;
+                ExRecSum.Price:= TotalItemsPrice;
+                ExRecSum.Weight:= TotalItemsWeight;
+                Rec.Price:= ExRecSum.Price;
+            end;
     end;
     trigger OnOpenPage()
     begin
@@ -184,6 +188,7 @@ page 60102 LunchMenuEdit
     end;
     trigger OnAfterGetRecord()
     begin
+        SumParams();
         GropeContol();
     end;
 

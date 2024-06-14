@@ -38,8 +38,12 @@ table 60102 LunchMenu
             begin
                 if LunchItemEx.Get("Item No.") then begin
                     Rec."Item Description" := LunchItemEx.Description;
+                    Rec.Price:= LunchItemEx.Price;
+                    Rec.Weight:= LunchItemEx.Weight;
                 end else begin
                     Rec."Item Description" := '';
+                    Rec.Price:= 0;
+                    Rec.Weight:= 0;
                 end;
             end;
         }
@@ -51,14 +55,13 @@ table 60102 LunchMenu
         field(6; "Weight"; Decimal)
         {
             Caption = 'Weight';
-            FieldClass = FlowField;
-            CalcFormula = Lookup("LunchItem".Weight WHERE("Item No." = FIELD("Item No.")));
+             DataClassification = CustomerContent;
+           
         }
         field(7; "Price"; Decimal)
         {
             Caption = 'Price';
-            FieldClass = FlowField;
-            CalcFormula = Lookup("LunchItem".Price WHERE("Item No." = FIELD("Item No.")));
+            DataClassification = CustomerContent;
         }
         field(8; "Indentation"; Integer)
         {
@@ -124,52 +127,36 @@ table 60102 LunchMenu
 
     var
         CurrRecEx: Record LunchMenu;
-        ListLineNoValues: List of [Integer];
-        LineNoValue: Integer;
-        BufferRecTable: Record "LunchMenuSystem";
-        IndentationItem: Integer;
 
     trigger OnInsert()
     var
         ExRec: Record LunchMenu;
-        i: Integer;
+        IsGroupLine: Boolean;
     begin
+        Rec.SetCurrentKey("Line No.");
         ExRec := Rec;
-        if CheckGroupHandler then begin
-            ResetValuesListHandler(ListLineNoValues);
-            BufferRecTable.DeleteAll();
-            if (ExRec."Parent Menu Item Entry No." = 0) then begin
-                ListLineNoValues:= SortList(ListLineNoValues, ExRec);
-                ListLineNoValues.Reverse();
-                Rec."Line No." := ListLineNoValues.Get(1) + 10000;
-                SetBufferValueHandler(Rec);
-            end;
-        end else begin
-            if BufferRecTable.FindLast() then begin
-                IndentationItem:= 1;
-                repeat
-                    Rec."Line No." := BufferRecTable."Line No." + 1;
-                    Rec.Indentation:= IndentationItem;
-                    SetBufferValueHandler(Rec);
-                until BufferRecTable.Next() = 0;
-            end;
-
-        end;
+        IsGroupLine:= CheckGroupHandler;
+        SetNewLineNo(IsGroupLine);
     end;
-
-    trigger OnModify()
+    trigger OnDelete()
     begin
         CurrRecEx := Rec;
-        CurrRecEx.SetRange("Line No.", CurrRecEx."Line No.", CurrRecEx."Line No." + 9999);
-        BufferRecTable.DeleteAll(); 
-        // mb bug no delete All;
-        if CurrRecEx.FindLast() then begin
-            repeat
-                SetBufferValueHandler(CurrRecEx);
-            until CurrRecEx.Next() = 0;
+        case Rec."Line Type" of
+            Rec."Line Type"::"Group":
+                begin
+                    CurrRecEx.SetRange("Line No.",Rec."Line No.",Rec."Line No."+9999);
+                    CurrRecEx.DeleteAll();
+                end;
+            else begin
+                Delete();
+            end;
         end;
+       
     end;
-
+    trigger OnModify()
+    begin
+        
+    end;
     procedure CheckGroupHandler(): Boolean;
     var
         isGroup: Boolean;
@@ -177,99 +164,40 @@ table 60102 LunchMenu
         CurrRecEx := Rec;
         if (CurrRecEx."Line Type" = CurrRecEx."Line Type"::Group) then begin
             isGroup := true;
+            
         end else begin
             isGroup := false;
         end;
         exit(isGroup);
     end;
 
-    procedure ResetValuesListHandler(var CheckList: List of [Integer])
+    procedure SetNewLineNo(var isGroup: Boolean)
+    var ExRecLocal: Record LunchMenu;
+        ExRecFunc: Record LunchMenu;
+        CurrentGroupLineNo: Integer;
     begin
-        if CheckList.Count > 0 then begin
-                CheckList.RemoveRange(0, CheckList.Count);
-            end;
+        ExRecLocal:= Rec;
+        ExRecLocal.SetCurrentKey("Line No.");
+        if isGroup then begin
+            ExRecLocal.SetRange("Line Type", "Line Type"::Group);
+            if ExRecLocal.FindLast() then 
+                repeat
+                    Rec."Line No.":= ExRecLocal."Line No."+10000;
+                until ExRecLocal.Next() = 0;   
+        end else begin
+                repeat
+                    if Rec."Parent Menu Item Entry No." = ExRecLocal."Menu Item Entry No." then begin
+                        CurrentGroupLineNo:= ExRecLocal."Line No.";
+                        ExRecFunc:= ExRecLocal;
+                        ExRecFunc.SetCurrentKey("Line No.");
+                        ExRecFunc.SetRange("Line No.",CurrentGroupLineNo,ExRecLocal."Line No."+9999);
+                        if ExRecFunc.FindLast() then
+                            repeat
+                                Rec."Line No.":= ExRecFunc."Line No."+1;
+                                exit;
+                            until ExRecFunc.Next() = 0;
+                    end;
+                until ExRecLocal.Next()=0;
+        end;
     end;
-    procedure SetBufferValueHandler(var RecordEx: Record LunchMenu)
-    begin
-        BufferRecTable."Line No." := RecordEx."Line No.";
-        BufferRecTable.Insert();
-    end;
-    procedure SortList (var SortedList: List of [Integer]; ExRec: Record LunchMenu): List of [Integer];
-        var ListCount, ShuffleEl, i, k: Integer;
-    begin
-        
-            repeat
-                if (ExRec."Line Type" <> ExRec."Line Type"::Item) then begin
-                    SortedList.Add(ExRec."Line No.");
-                end;
-            until ExRec.Next() = 0;
-    
-            ListCount:= SortedList.Count;
-
-           
-            if (ListCount<0) then begin
-                SortedList.Add(0);
-            end else begin
-                for k := 2 to ListCount+1 do  
-                    for i := 1 to ListCount+1-k do  
-                        if SortedList.Get(i)>SortedList.Get(i+1) then begin
-                            ShuffleEl:= ListLineNoValues.Get(i);
-                            SortedList.Set(i, ListLineNoValues.Get(i+1), ShuffleEl);
-                            SortedList.Set(i+1, ShuffleEl);
-                        end;
-            end;
-            exit(SortedList)
-            
-    end;
-}
-
-
-
-// PAGE NEED ONLY FOR TEST
-page 60222 PageName
-{
-    PageType = List;
-    ApplicationArea = All;
-    UsageCategory = Lists;
-    SourceTable = LunchMenuSystem;
-    Caption = 'LunchMenuSystem';
-
-    layout
-    {
-        area(Content)
-        {
-            repeater(GroupName)
-            {
-                field("Line No."; Rec."Line No.")
-                {
-                    ApplicationArea = All;
-
-                }
-                field("Parent Menu Item Entry No."; Rec."Parent Menu Item Entry No.")
-                {
-                    ApplicationArea = all;
-                }
-            }
-        }
-        area(Factboxes)
-        {
-
-        }
-    }
-
-    actions
-    {
-        area(Processing)
-        {
-            action(ActionName)
-            {
-                ApplicationArea = All;
-
-                trigger OnAction()
-                begin
-
-                end;
-            }
-        }
-    }
 }
