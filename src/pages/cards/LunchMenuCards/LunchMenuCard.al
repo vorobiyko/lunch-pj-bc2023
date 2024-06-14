@@ -17,6 +17,7 @@ page 60133 LunchMenuCard
                 {
                     ApplicationArea = all;
                     Caption = 'Line Type';
+                    ValuesAllowed = "Group";
                 }
                 field("Line No."; Rec."Line No.")
                 {
@@ -81,4 +82,5 @@ page 60133 LunchMenuCard
    begin
     CurrPage.Update();
    end;
+   
 }
