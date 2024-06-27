@@ -5,8 +5,6 @@ page 60124 LunchVendorCard
     Caption = 'Lunch Vendor Card';
     SourceTable = LunchVendorTable;
 
-    
-    
     layout
     {
         area(Content)
@@ -33,23 +31,4 @@ page 60124 LunchVendorCard
             }
         }
     }
-    
-    // actions
-    // {
-    //     area(Processing)
-    //     {
-    //         action(ActionName)
-    //         {
-    //             ApplicationArea = All;
-                
-    //             trigger OnAction()
-    //             begin
-                    
-    //             end;
-    //         }
-    //     }
-    // }
-    
-    // var
-    //     myInt: Integer;
 }

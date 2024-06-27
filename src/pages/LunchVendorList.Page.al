@@ -19,10 +19,7 @@ page 60104 LunchVendorList
                     // ApplicationArea = All;
                     ApplicationArea = All;
                    
-                    ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
-                   
-
-                   
+                    ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.'; 
 
                 }
                 field("Company"; Rec.Company)
@@ -31,33 +28,7 @@ page 60104 LunchVendorList
                     ToolTip = 'Name Vendor company';
 
                 }
-
-
             }
-
         }
-        // area(Factboxes)
-        // {
-
-        // }
-
-
     }
-
-    // actions
-    // {
-    //     area(Processing)
-    //     {
-    //         action(ActionName)
-    //         {
-    //             ApplicationArea = All;
-
-    //             trigger OnAction()
-    //             begin
-
-    //             end;
-    //         }
-    //     }
-    // }
-
 }

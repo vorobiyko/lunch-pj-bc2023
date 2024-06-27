@@ -3,8 +3,7 @@ page 60121 LunchItemCard
     PageType = Card;
     UsageCategory = None;
     Caption = 'Lunch Item Card';
-    SourceTable = LunchItem;
-    
+    SourceTable = LunchItem; 
     layout
     {
         area(Content)
@@ -21,11 +20,10 @@ page 60121 LunchItemCard
                     ToolTip = 'Specifies the value of the No. field.';
                     Editable = false;
                     trigger OnAssistEdit()
-                     begin
-                         if Rec.AssistEdit(xRec) then
-                             CurrPage.Update();
-                     end;
-                    
+                    begin
+                        if Rec.AssistEdit(xRec) then
+                            CurrPage.Update();
+                    end;
                 }
                 field("Description"; Rec.Description)
                 {
@@ -39,10 +37,6 @@ page 60121 LunchItemCard
                 {
                     ApplicationArea = All;
                 }
-                field("Picture"; Rec.Picture)
-                {
-                    ApplicationArea = All;
-                }
                 field("Info Link"; Rec."Info Link")
                 {
                     ApplicationArea = All;
@@ -51,26 +45,12 @@ page 60121 LunchItemCard
                 {
                     ApplicationArea = All;
                 }
-            }
-        }
-    }
-    
-    // actions
-    // {
-    //     area(Processing)
-    //     {
-    //         action(ActionName)
-    //         {
-    //             ApplicationArea = All;
-                
-    //             trigger OnAction()
-    //             begin
+                field("Picture"; Rec.Picture){
+                    ApplicationArea= all;
+                    Caption = 'Item Image';
                     
-    //             end;
-    //         }
-    //     }
-    // }
-    
-    // var
-    //     myInt: Integer;
+                }
+            }
+        }  
+    }
 }

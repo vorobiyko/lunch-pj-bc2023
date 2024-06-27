@@ -2,8 +2,9 @@ table 60102 LunchMenu
 {
     DataClassification = CustomerContent;
     Caption = 'Lunch Menu Table';
-    DrillDownPageID = LunchMenuEdit;
-    LookupPageID = LunchMenuEdit;
+    DrillDownPageID = LunchOrder;
+    LookupPageID = LunchOrder;
+
     fields
     {
         field(1; "Line No."; Integer)
@@ -56,7 +57,6 @@ table 60102 LunchMenu
         {
             Caption = 'Weight';
              DataClassification = CustomerContent;
-           
         }
         field(7; "Price"; Decimal)
         {
@@ -84,8 +84,9 @@ table 60102 LunchMenu
         {
             DataClassification = CustomerContent;
             Caption = 'Order Quantity';
-            MinValue = 0;
+            InitValue = 0;
             DecimalPlaces = 0;
+            Editable = true;
         }
         field(12; "Order Amount"; Decimal)
         {
@@ -98,13 +99,13 @@ table 60102 LunchMenu
             Caption = 'Line Type';
             OptionMembers = "Item","Group";
         }
-        // field(14; "Previous Quantity"; Decimal)
-        // {
-        //     Caption = 'Previous Quantity';
-        //     FieldClass = FlowField;
-        //     MinValue = 0;
-        // CalcFormula = Sum("LunchOrderEntry".Quantity WHERE ("Menu Item Entry No."=FIELD("Menu Item Entry No.")));
-        // }
+        field(14; "Previous Quantity"; Decimal)
+        {
+            Caption = 'Previous Quantity';
+            FieldClass = FlowField;
+            MinValue = 0;
+            CalcFormula = Sum("LunchOrderEntry".Quantity WHERE ("Menu Item Entry No."=FIELD("Menu Item Entry No.")));
+        }
         field(15; "Self-Order"; Boolean)
         {
             Caption = 'Self-Order';
@@ -124,10 +125,12 @@ table 60102 LunchMenu
             Clustered = true;
         }
     }
-
     var
         CurrRecEx: Record LunchMenu;
-
+        CurrConditionRec: Record LunchMenu;
+        ExOrderEntryTable: Record LunchOrderEntry;
+        RecCurrOrderTable: Record LunchOrderEntry;
+        isAllowDeleteModify: Boolean;
     trigger OnInsert()
     var
         ExRec: Record LunchMenu;
@@ -137,26 +140,156 @@ table 60102 LunchMenu
         ExRec := Rec;
         IsGroupLine:= CheckGroupHandler;
         SetNewLineNo(IsGroupLine);
+        SetOrderAmountItem();
     end;
     trigger OnDelete()
+    var RecLunchMenu: Record LunchMenu;
+        RecOrderEnt: Record LunchOrderEntry;
+        HasSpyRec: Boolean;
+        SpyRec: Record LunchMenu;
     begin
-        CurrRecEx := Rec;
-        case Rec."Line Type" of
-            Rec."Line Type"::"Group":
-                begin
-                    CurrRecEx.SetRange("Line No.",Rec."Line No.",Rec."Line No."+9999);
-                    CurrRecEx.DeleteAll();
-                end;
-            else begin
-                Delete();
+        RecLunchMenu:= Rec;
+        if RecLunchMenu.CheckGroupHandler() then begin
+            //Group
+            // Set Range and Choice Rec
+            SetRangeGroup(RecLunchMenu, 1, 9999);
+            RecLunchMenu.Next();
+            // Checked has Rec how you want delete in OrderTable
+            CheckDependTableIfEmpty(RecOrderEnt); 
+            repeat
+                repeat
+                    if ChekerDelModAllowedLunchMenu(RecLunchMenu,RecOrderEnt) then begin
+                        // Allow to delete. Order is empty;
+                        isAllowDeleteModify:= true;
+                    end else begin
+                        //Order has Rec
+                        isAllowDeleteModify:=false;
+                        break;
+                    end;
+                until RecOrderEnt.Next()=0;
+                if not isAllowDeleteModify then
+                    break; 
+            until RecLunchMenu.Next()=0;
+            // Delete or Check More ->
+            if isAllowDeleteModify then begin
+                RecLunchMenu:= Rec;
+                SetRangeGroup(RecLunchMenu, 0, 9999);
+                RecLunchMenu.DeleteAll();
+                exit;
+            end else begin
+                // Check more ...
+                RecLunchMenu.FindFirst();
+                RecOrderEnt.FindFirst();
+                repeat
+                    repeat
+                        if CheckPermissionToDelModRecord(RecLunchMenu,RecOrderEnt) then begin
+                            // delete
+                            HasSpyRec:= false;
+                            CurrConditionRec:= RecLunchMenu;
+                            ExOrderEntryTable:=RecOrderEnt;
+                            SyncDelete(CurrConditionRec,ExOrderEntryTable);
+                            break;
+                        end else if RecLunchMenu."Menu Item Entry No." <> RecOrderEnt."Menu Item Entry No." then begin
+                            // none
+                            HasSpyRec:=true;
+                            SpyRec:= RecLunchMenu;
+                        end else begin
+                            HasSpyRec:=false;
+                            break;
+                        end;
+                    until RecOrderEnt.Next() = 0;
+                until RecLunchMenu.Next() = 0;
             end;
+            // check spy rec
+            if (HasSpyRec) AND (SpyRec.Count>0) then
+                SpyRec.Delete();
+
+            // Check if needed Group
+            if RecLunchMenu.Count()>0 then begin
+                // Need Group
+                AvoidDelete();   
+            end else begin
+                // Needed delete Group
+                Rec.Delete();
+            end;;
+        end else begin
+            // Item
+            // If Rec in Orders
+            CheckDependTableIfEmpty(RecOrderEnt); 
+            repeat
+                if ChekerDelModAllowedLunchMenu(RecLunchMenu,RecOrderEnt) then begin
+                    // Allow to delete. Order is empty;
+                        isAllowDeleteModify:=true;
+                    end else begin
+                    //Order has Rec
+                        if CheckPermissionToDelModRecord(RecLunchMenu,RecOrderEnt) then begin
+                            SyncDelete(RecLunchMenu,RecOrderEnt);
+                            isAllowDeleteModify:=false;
+                        end else begin
+                            Message('%1 Sended to Vendor', RecLunchMenu."Item No.");
+                            isAllowDeleteModify:=false;
+                        end;
+                        break;
+                    end;
+            until RecOrderEnt.Next()=0;
+            if isAllowDeleteModify then begin
+                Rec.Delete();
+            end else begin
+                AvoidDelete();
+            end;
+ 
         end;
-       
     end;
     trigger OnModify()
-    begin
+    var RecLunchMenu: Record LunchMenu;
+        RecOrderEnt: Record LunchOrderEntry;
+        SpyRec: Record LunchMenu;
+        HasSpyRec: Boolean;
         
+    begin
+        SetOrderAmountItem();
+        RecLunchMenu:= Rec;
+        CheckDependTableIfEmpty(RecOrderEnt); 
+            repeat
+                if ChekerDelModAllowedLunchMenu(RecLunchMenu,RecOrderEnt) then begin
+                    // Allow to delete. Order is empty;
+                    end else begin
+                    //Order has Rec
+                        if CheckPermissionToDelModRecord(RecLunchMenu,RecOrderEnt) then begin
+                            RecOrderEnt.Quantity:= RecLunchMenu."Order Quantity";
+                            RecOrderEnt.Modify();
+                        end else begin
+                            Message('%1 Sended to Vendor', RecLunchMenu."Item No.");
+                        end;
+                        break;
+                    end;
+            until RecOrderEnt.Next()=0;
     end;
+
+    procedure CheckPermissionToDelModRecord(var CheckLunnchMenu: Record LunchMenu; var CheckOrder: Record LunchOrderEntry ):Boolean;
+    begin
+        if (CheckLunnchMenu."Menu Item Entry No."=CheckOrder."Menu Item Entry No.") and (CheckOrder.Status=CheckOrder.Status::Created) then begin
+            // allow delete;
+            exit(true);
+        end else begin
+            // No delete;
+            exit(false);
+        end;
+    end;
+
+    procedure ChekerDelModAllowedLunchMenu(var CheckLunnchMenu: Record LunchMenu; var CheckOrder: Record LunchOrderEntry ):Boolean;
+    begin
+        if (CheckLunnchMenu."Menu Item Entry No." = CheckOrder."Menu Item Entry No.")  then begin
+            exit(false);
+        end else if CheckOrder.IsEmpty then begin
+            exit(true);
+        end else begin
+            exit (true); 
+            // I Order not Rec/ you can delete modify
+        end;
+    end;
+
+    
     procedure CheckGroupHandler(): Boolean;
     var
         isGroup: Boolean;
@@ -164,7 +297,6 @@ table 60102 LunchMenu
         CurrRecEx := Rec;
         if (CurrRecEx."Line Type" = CurrRecEx."Line Type"::Group) then begin
             isGroup := true;
-            
         end else begin
             isGroup := false;
         end;
@@ -183,6 +315,7 @@ table 60102 LunchMenu
             if ExRecLocal.FindLast() then 
                 repeat
                     Rec."Line No.":= ExRecLocal."Line No."+10000;
+                    Rec.Indentation:= 0;
                 until ExRecLocal.Next() = 0;   
         end else begin
                 repeat
@@ -194,10 +327,38 @@ table 60102 LunchMenu
                         if ExRecFunc.FindLast() then
                             repeat
                                 Rec."Line No.":= ExRecFunc."Line No."+1;
+                                Rec.Indentation:= 1;
+                                Rec."Menu Date":= ExRecFunc."Menu Date";
                                 exit;
                             until ExRecFunc.Next() = 0;
                     end;
                 until ExRecLocal.Next()=0;
         end;
+    end;
+    procedure SetRangeGroup(var RecordGroup: Record LunchMenu; MoveStep: Integer; GroupSize: Integer)
+    begin
+        RecordGroup.SetCurrentKey("Line No.");
+        RecordGroup.SetRange("Line No.", "Line No."+MoveStep, "Line No."+GroupSize);
+    end;
+    procedure SyncDelete(var RecMainTable: Record LunchMenu; RecDependTable: Record LunchOrderEntry)
+    begin
+        RecMainTable.Delete();
+        RecDependTable.Delete();
+    end;
+    procedure AvoidDelete()
+    begin
+        Rec.Init();
+        Rec."Line No.":= 10000*Rec.Count();
+        Rec.Insert();
+    end;
+    procedure CheckDependTableIfEmpty(var CheckedDependTable: Record LunchOrderEntry)
+    begin
+        if not CheckedDependTable.FindFirst() then begin
+                Message('Have not orders');
+        end;
+    end;
+    procedure SetOrderAmountItem()
+    begin
+        Rec."Order Amount":= Rec."Order Quantity"*Rec.Price;
     end;
 }

@@ -1,18 +1,18 @@
-page 60133 LunchMenuCard
+page 60133 LunchMenuEditCard
 {
     PageType = Card;
     ApplicationArea = All;
     UsageCategory = Administration;
     SourceTable = LunchMenu;
     AutoSplitKey = true;
-
+    Caption = 'Lunch Menu Edit Card';
     layout
     {
         area(Content)
         {
             group(General)
             {
-                Caption = 'MenuCard';
+                Caption = 'Group Settings';
                 field("Line Type"; Rec."Line Type")
                 {
                     ApplicationArea = all;
@@ -28,7 +28,7 @@ page 60133 LunchMenuCard
                 field("Item Description"; Rec."Item Description")
                 {
                     ApplicationArea = All;
-                    Caption = 'Item Description';
+                    Caption = 'Description Group';
                     Editable = true;
                     Enabled = true;
                 }
@@ -36,6 +36,7 @@ page 60133 LunchMenuCard
                 {
                     ApplicationArea = All;
                     Caption = 'Menu Item Entry No.';
+                    Editable = false;
                 }
                 field("Active"; Rec.Active)
                 {
@@ -46,11 +47,13 @@ page 60133 LunchMenuCard
                 {
                     ApplicationArea = all;
                     Caption = 'Order Quantity';
+                    Visible=false;
                 }
                 field("Order Amount"; Rec."Order Amount")
                 {
                     ApplicationArea = all;
                     Caption = 'Order Amount';
+                    Visible= false;
                 }
                 field("Self-Order"; Rec."Self-Order")
                 {
@@ -58,11 +61,13 @@ page 60133 LunchMenuCard
                     Caption = 'Self-Order';
                     Editable = false;
                     Enabled = false;
+                    Visible=false;
                 }
                 field("Menu Date"; Rec."Menu Date")
                 {
                     ApplicationArea = All;
                     Caption = 'Menu Date';
+                    NotBlank=true;
                 }
             }
             group("Items List")
@@ -71,16 +76,16 @@ page 60133 LunchMenuCard
                 {
                     // Filter on the sales orders that relate to the customer in the card page.
                     SubPageLink = "Parent Menu Item Entry No." = field("Menu Item Entry No.");
-
                 }
             }
         }
     }
-
+    var
+        ExOrderEntryTable: Record LunchOrderEntry;
+        ExMunuTable: Record LunchMenu;
     // Trigger was created for lunch OnModify on LunchMenu.Table. 
    trigger OnOpenPage()
    begin
     CurrPage.Update();
    end;
-   
 }

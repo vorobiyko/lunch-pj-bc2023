@@ -20,7 +20,6 @@
                 {
                     ToolTip = 'Specifies the value of the Item No. field.';
                 }
-
             }
         }
     }

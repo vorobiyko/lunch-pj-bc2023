@@ -42,6 +42,7 @@ table 60101 LunchItem
         {
             DataClassification = CustomerContent;
             Caption = 'Picture';
+            Subtype = Bitmap;
         }
         field(7; "Info Link"; Text[250])
         {
@@ -101,33 +102,4 @@ table 60101 LunchItem
              exit(true);
          end;
      end;
-
-    // fieldgroups
-    // {
-    //     // Add changes to field groups here
-    // }
-
-    // var
-    //     myInt: Integer;
-
-    // trigger OnInsert()
-    // begin
-
-    // end;
-
-    // trigger OnModify()
-    // begin
-
-    // end;
-
-    // trigger OnDelete()
-    // begin
-
-    // end;
-
-    // trigger OnRename()
-    // begin
-
-    // end;
-
 }

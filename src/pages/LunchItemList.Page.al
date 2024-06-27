@@ -48,25 +48,5 @@ page 60122 LunchItemList
                 }
             }
         }
-        // area(Factboxes)
-        // {
-
-        // }
     }
-
-    // actions
-    // {
-    //     area(Processing)
-    //     {
-    //         action(ActionName)
-    //         {
-    //             ApplicationArea = All;
-
-    //             trigger OnAction()
-    //             begin
-
-    //             end;
-    //         }
-    //     }
-    // }
 }
