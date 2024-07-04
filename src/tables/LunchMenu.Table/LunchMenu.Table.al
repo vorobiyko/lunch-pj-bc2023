@@ -97,7 +97,7 @@ table 60102 LunchMenu
         {
             DataClassification = CustomerContent;
             Caption = 'Line Type';
-            OptionMembers = "Item","Group";
+            OptionMembers = "Item", "Group";
         }
         field(14; "Previous Quantity"; Decimal)
         {
@@ -247,6 +247,7 @@ table 60102 LunchMenu
         HasSpyRec: Boolean;
         
     begin
+        CheckActiveRec();
         SetOrderAmountItem();
         RecLunchMenu:= Rec;
         CheckDependTableIfEmpty(RecOrderEnt); 
@@ -265,7 +266,21 @@ table 60102 LunchMenu
                     end;
             until RecOrderEnt.Next()=0;
     end;
-
+    procedure CheckActiveRec()
+    begin
+        if Rec.CheckGroupHandler() then begin
+            CurrRecEx:= Rec;
+            CurrRecEx.SetRangeGroup(CurrRecEx, 1, 9999);
+            if CurrRecEx.FindFirst() then begin
+                repeat
+                    CurrRecEx."Menu Date":= Rec."Menu Date";
+                    CurrRecEx.Active:= Rec.Active;
+                    CurrRecEx.Modify();
+             until CurrRecEx.Next()=0;
+            end;
+        end;
+        
+    end;
     procedure CheckPermissionToDelModRecord(var CheckLunnchMenu: Record LunchMenu; var CheckOrder: Record LunchOrderEntry ):Boolean;
     begin
         if (CheckLunnchMenu."Menu Item Entry No."=CheckOrder."Menu Item Entry No.") and (CheckOrder.Status=CheckOrder.Status::Created) then begin
@@ -329,6 +344,7 @@ table 60102 LunchMenu
                                 Rec."Line No.":= ExRecFunc."Line No."+1;
                                 Rec.Indentation:= 1;
                                 Rec."Menu Date":= ExRecFunc."Menu Date";
+                                Rec.Active:= ExRecFunc.Active;
                                 exit;
                             until ExRecFunc.Next() = 0;
                     end;
@@ -361,4 +377,5 @@ table 60102 LunchMenu
     begin
         Rec."Order Amount":= Rec."Order Quantity"*Rec.Price;
     end;
+
 }

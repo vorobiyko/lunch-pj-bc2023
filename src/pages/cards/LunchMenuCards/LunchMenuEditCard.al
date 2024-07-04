@@ -19,6 +19,12 @@ page 60133 LunchMenuEditCard
                     Caption = 'Line Type';
                     ValuesAllowed = "Group";
                 }
+                field("Menu Date"; Rec."Menu Date")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Menu Date';
+                    NotBlank=true;
+                }
                 field("Line No."; Rec."Line No.")
                 {
                     ApplicationArea = All;
@@ -63,12 +69,7 @@ page 60133 LunchMenuEditCard
                     Enabled = false;
                     Visible=false;
                 }
-                field("Menu Date"; Rec."Menu Date")
-                {
-                    ApplicationArea = All;
-                    Caption = 'Menu Date';
-                    NotBlank=true;
-                }
+                
             }
             group("Items List")
             {
@@ -87,5 +88,15 @@ page 60133 LunchMenuEditCard
    trigger OnOpenPage()
    begin
     CurrPage.Update();
+    ConnectorGrouptoItems();
    end;
+   
+   
+    procedure ConnectorGrouptoItems()
+    var RecLunchMenuL: Record LunchMenu;
+    begin
+
+       
+
+    end;
 }

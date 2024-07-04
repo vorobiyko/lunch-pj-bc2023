@@ -32,6 +32,9 @@ page 60202 ItemsPart
                     ApplicationArea = All;
                     Enabled = true;
                 }
+                field("Active"; Rec.Active){
+                    Editable=false;
+                }
                 field("Parent Menu Item Entry No."; Rec."Parent Menu Item Entry No.")
                 {
                     ApplicationArea = All;

@@ -19,16 +19,16 @@
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>1.80264in</Width>
+                  <Width>1.74431in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>3.82764in</Width>
+                  <Width>3.76931in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.17486in</Width>
+                  <Width>1.11653in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.14986in</Width>
+                  <Width>1.09153in</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -359,9 +359,9 @@
               </TablixMembers>
             </TablixRowHierarchy>
             <DataSetName>DataSet_Result</DataSetName>
-            <Top>0.64167in</Top>
+            <Top>0.65556in</Top>
             <Height>1.33334in</Height>
-            <Width>7.955in</Width>
+            <Width>7.72167in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -396,7 +396,6 @@
                 </Paragraphs>
                 <rd:DefaultName>Menu_Date</rd:DefaultName>
                 <Top>0.1in</Top>
-                <Left>0.31667in</Left>
                 <Height>0.47223in</Height>
                 <Width>7.35in</Width>
                 <Style>
@@ -411,9 +410,8 @@
               </Textbox>
             </ReportItems>
             <KeepTogether>true</KeepTogether>
-            <Left>0.02167in</Left>
             <Height>0.6in</Height>
-            <Width>7.93333in</Width>
+            <Width>7.72167in</Width>
             <ZIndex>1</ZIndex>
             <Style>
               <Border>
@@ -422,11 +420,18 @@
             </Style>
           </Rectangle>
         </ReportItems>
-        <Height>2.81166in</Height>
+        <Height>5.05179cm</Height>
         <Style />
       </Body>
-      <Width>9.64667in</Width>
+      <Width>19.61303cm</Width>
       <Page>
+        <PageHeight>29.7cm</PageHeight>
+        <PageWidth>21cm</PageWidth>
+        <LeftMargin>1cm</LeftMargin>
+        <RightMargin>0cm</RightMargin>
+        <TopMargin>0cm</TopMargin>
+        <BottomMargin>0cm</BottomMargin>
+        <ColumnSpacing>1.27cm</ColumnSpacing>
         <Style />
       </Page>
     </ReportSection>
@@ -468,7 +473,7 @@ End Function
 </Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
-  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportUnitType>Cm</rd:ReportUnitType>
   <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">

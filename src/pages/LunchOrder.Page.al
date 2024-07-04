@@ -3,7 +3,7 @@ page 60102 LunchOrder
     PageType = List;
     ApplicationArea = All;
     UsageCategory = Lists;
-    Caption = 'Lunch Order';
+    Caption = 'Lunch Order Menu';
     SourceTable = LunchMenu;
     CardPageId = LunchMenuEditCard;
     Editable = true;
@@ -36,7 +36,7 @@ page 60102 LunchOrder
                 {
                     ApplicationArea = All;
                     Caption = 'Item No.';
-                    StyleExpr = TypeControl;
+                    StyleExpr = ColorStatus;
                     Editable = IsCanModify;
                 }
                 field("Line Type"; Rec."Line Type")
@@ -50,7 +50,7 @@ page 60102 LunchOrder
                 {
                     ApplicationArea = All;
                     Caption = 'Item Description';
-                    StyleExpr = TypeControl;
+                    StyleExpr = ColorStatus;
                     Editable = IsCanModify;
                 }
                 field("Weight"; Rec."Weight")
@@ -88,7 +88,7 @@ page 60102 LunchOrder
                     ApplicationArea = all;
                     Caption = 'Active';
                     StyleExpr = TypeControl;
-                    Editable = IsCanModify;
+                    Editable = false;
                 }
                 field("Order Quantity"; Rec."Order Quantity")
                 {
@@ -108,6 +108,7 @@ page 60102 LunchOrder
                 {
                     ApplicationArea = all;
                     Caption = 'Previous Quantity';
+                    Editable = false;
                 }
                 field("Self-Order"; Rec."Self-Order")
                 {
@@ -168,6 +169,7 @@ page 60102 LunchOrder
     }
     var
         TypeControl: Text;
+        ColorStatus: Text;
         ExLunchMenu: Record LunchMenu;
         ItemRec: Record LunchMenu;
         ExOrderEntry: Record LunchOrderEntry;
@@ -181,6 +183,7 @@ page 60102 LunchOrder
     begin
         Rec.SetCurrentKey("Line No.");
         Rec.SetAscending("Line No.", false);
+        SetSevenDaysFilter();
     end;
     trigger OnClosePage()
     begin
@@ -190,7 +193,24 @@ page 60102 LunchOrder
     trigger OnAfterGetRecord()
     begin
         SumParams();
-        GroupContol();       
+        GroupContol(Rec);
+        CheckActiveRec();
+        SetStyleStatusRec();  
+    end;
+    
+    procedure SetSevenDaysFilter()
+    var StartDate: Date;
+        EndDate: Date;
+        LastRecLunch: Record LunchMenu;
+    begin
+        LastRecLunch:= Rec;
+        if not LastRecLunch.IsEmpty then begin
+            LastRecLunch.SetCurrentKey("Menu Date");
+            LastRecLunch.FindLast();
+            StartDate:= LastRecLunch."Menu Date";
+            EndDate:= StartDate-7;
+            Rec.SetFilter("Menu Date",'%2..%1',StartDate, EndDate);
+        end;
     end;
     procedure AddRecordToOrder()
     begin
@@ -213,6 +233,9 @@ page 60102 LunchOrder
                             if IsRecExistOrderEntry then begin
                                 IsRecExistOrderEntry:=false;
                             end;
+                            if ItemRec.Active = false then begin
+                                IsRecExistOrderEntry:=true;
+                            end;
                             if(ExOrderEntryLoop.FindSet()) then begin
                                 repeat
                                 if ((ItemRec."Menu Item Entry No." = ExOrderEntryLoop."Menu Item Entry No.")) then begin
@@ -233,6 +256,7 @@ page 60102 LunchOrder
                                     ExOrderEntry.Status:= ExOrderEntry.Status::Created;
                                     ExOrderEntry.Amount:= ItemRec."Order Amount";
                                     ExOrderEntry."Vendor No.":= ItemRec."Vendor No.";
+                                    ExOrderEntry."Resource No.":= UserId;
                                     if IsNotEmpty then begin
                                         ExOrderEntryLoop.FindLast();
                                         ExOrderEntry."Entry No.":=ExOrderEntryLoop."Entry No."+1;
@@ -257,10 +281,11 @@ page 60102 LunchOrder
             ExLunchMenu.Modify();
         until ExLunchMenu.Next()=0; 
     end;
-  procedure GroupContol(): Text;
+  procedure GroupContol(var LunchMenuRecord: Record LunchMenu): Text;
     var ExRecStatus: Record LunchMenu;
     begin
-       ExRecStatus:= Rec;
+    //    ExRecStatus:= Rec;
+        ExRecStatus:= LunchMenuRecord;
         case ExRecStatus."Line Type" of
             ExRecStatus."Line Type"::"Group":
                 begin
@@ -273,6 +298,19 @@ page 60102 LunchOrder
         end;
         exit(TypeControl);
     end;
+    procedure CheckActiveRec()
+     var ExRecStatus: Record LunchMenu;
+    begin
+        ExRecStatus:= Rec;
+        if ExRecStatus."Line Type"=ExRecStatus."Line Type"::Item then begin
+            if ExRecStatus.Active = true then begin
+                    IsCanModifyQuantityGroup:= true;     
+                end else begin
+                    IsCanModifyQuantityGroup:= false;
+                end;
+            end;
+    end;
+
     procedure SumParams()
     var ExRecSum: Record LunchMenu;
         RecordGroup: Record LunchMenu;
@@ -297,6 +335,31 @@ page 60102 LunchOrder
             Rec."Order Amount":= ExRecSum."Order Amount";
             Rec.Weight:= ExRecSum.Weight;
             Rec."Order Quantity":= ExRecSum."Order Quantity";
+        end;
+    end;
+    procedure SetStyleStatusRec()
+    begin
+        if not ExOrderEntry.IsEmpty then begin
+
+            ExOrderEntry.FindFirst();
+            repeat
+                if Rec."Menu Item Entry No."= ExOrderEntry."Menu Item Entry No." then begin
+                    case ExOrderEntry."Status" of
+                        ExOrderEntry."Status"::"Sent to Vendor":
+                    begin
+                        ColorStatus := 'StrongAccent';     
+                    end;
+                        ExOrderEntry.Status::Posted:
+                    begin
+                        ColorStatus := 'Favorable'; 
+                    end;
+                        ExOrderEntry.Status::Created:
+                    begin
+                        ColorStatus:= 'Standard';
+                    end;
+                    end;
+                end;
+            until ExOrderEntry.Next()= 0;
         end;
     end;  
 }

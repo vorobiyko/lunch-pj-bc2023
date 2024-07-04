@@ -5,6 +5,7 @@ page 60103 LunchOrderEntry
     UsageCategory = Lists;
     Caption = 'Lunch Order Page';
     SourceTable = LunchOrderEntry;
+    SourceTableView = sorting("order Date") order(descending);
     // Editable = false;
     // InsertAllowed = false;
     
@@ -16,48 +17,48 @@ page 60103 LunchOrderEntry
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = All;
+                    StyleExpr = TypeControl;
                 }
                 field("Order Date"; Rec."Order Date")
                 {
-                    ApplicationArea = All;
+                    StyleExpr = TypeControl;
                 }
                 field("Resource No."; Rec."Resource No.")
                 {
-                    ApplicationArea = All;
+                    StyleExpr = TypeControl;
                 }
                 field("Menu Item Entry No."; Rec."Menu Item Entry No.")
                 {
-                    ApplicationArea = All;
+                    StyleExpr = TypeControl;
                 }
                 field("Vendor No."; Rec."Vendor No.")
                 {
-                    ApplicationArea = All;
+                    StyleExpr = TypeControl;
                 }
                 field("Menu Item No."; Rec."Menu Item No.")
                 {
-                    ApplicationArea = All;
+                    StyleExpr = TypeControl;
                 }
                 field("Item Description"; Rec."Item Description")
                 {
-                    ApplicationArea = All;
+                    StyleExpr = TypeControl;
                 }
                 field("Quantity"; Rec."Quantity")
                 {
-                    ApplicationArea = All;
+                    StyleExpr = TypeControl;
                 }
                 field("Price"; Rec."Price")
                 {
-                    ApplicationArea = All;
+                    StyleExpr = TypeControl;
                 }
                 field("Amount"; Rec."Amount")
                 {
-                    ApplicationArea = All;
+                    StyleExpr = TypeControl;
                 }
                 field("Status"; Rec."Status")
                 {
-                    ApplicationArea = All;
                     Editable = true;
+                    StyleExpr = TypeControl;
                 }
             }
         }
@@ -76,9 +77,49 @@ page 60103 LunchOrderEntry
                 trigger OnAction()
                 begin
                     Rec.Status:= Rec.Status::"Sent to Vendor";
+
+                    CurrPage.Update();
+                end;
+            }
+            action("Mark Posted")
+            {
+                Promoted = true;
+                PromotedCategory = Process;
+                Image = "Invoicing-Send";
+                ApplicationArea = All;
+                
+                trigger OnAction()
+                begin
+                    Rec.Status:= Rec.Status::Posted;
                     CurrPage.Update();
                 end;
             }
         }
     }
+    var ExRecStatus: Record LunchOrderEntry;
+        TypeControl: Text;
+    trigger OnAfterGetRecord()
+    begin
+        Rec.SetCurrentKey("Order Date");
+        StatusStyleControl();
+    end;
+    procedure StatusStyleControl()
+    begin
+        ExRecStatus:= Rec;
+        case ExRecStatus."Status" of
+            ExRecStatus."Status"::"Sent to Vendor":
+                begin
+                    TypeControl := 'StrongAccent';     
+                end;
+            ExRecStatus.Status::Posted:
+                begin
+                    TypeControl := 'Favorable'; 
+                end;
+            ExRecStatus.Status::Created:
+                begin
+                    TypeControl:= 'Standard';
+                end;
+
+        end;
+    end;
 }
