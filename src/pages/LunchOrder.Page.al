@@ -80,7 +80,7 @@ page 60102 LunchOrder
                     ApplicationArea = All;
                     Caption = 'Menu Item Entry No.';
                     StyleExpr = TypeControl;
-                    Visible = false;
+                    // Visible = false;
                     Editable = false;
                 }
                 field("Active"; Rec.Active)
@@ -194,8 +194,9 @@ page 60102 LunchOrder
     begin
         SumParams();
         GroupContol(Rec);
-        CheckActiveRec();
-        SetStyleStatusRec();  
+        CheckActiveRec(Rec);
+        SetStyleStatusRec();
+         
     end;
     
     procedure SetSevenDaysFilter()
@@ -298,10 +299,10 @@ page 60102 LunchOrder
         end;
         exit(TypeControl);
     end;
-    procedure CheckActiveRec()
+    procedure CheckActiveRec(var LunchMenuRecord: Record LunchMenu)
      var ExRecStatus: Record LunchMenu;
     begin
-        ExRecStatus:= Rec;
+        ExRecStatus:= LunchMenuRecord;
         if ExRecStatus."Line Type"=ExRecStatus."Line Type"::Item then begin
             if ExRecStatus.Active = true then begin
                     IsCanModifyQuantityGroup:= true;     
@@ -340,7 +341,6 @@ page 60102 LunchOrder
     procedure SetStyleStatusRec()
     begin
         if not ExOrderEntry.IsEmpty then begin
-
             ExOrderEntry.FindFirst();
             repeat
                 if Rec."Menu Item Entry No."= ExOrderEntry."Menu Item Entry No." then begin
@@ -359,6 +359,8 @@ page 60102 LunchOrder
                     end;
                     end;
                 end;
+                if Rec."Line Type"=Rec."Line Type"::Group then
+                    ColorStatus:= 'Strong';
             until ExOrderEntry.Next()= 0;
         end;
     end;  

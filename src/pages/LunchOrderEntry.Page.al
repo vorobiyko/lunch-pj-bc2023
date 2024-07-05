@@ -76,28 +76,50 @@ page 60103 LunchOrderEntry
                 
                 trigger OnAction()
                 begin
-                    Rec.Status:= Rec.Status::"Sent to Vendor";
-
-                    CurrPage.Update();
+                    if (Rec.Quantity<>0) then begin
+                       if ApiPage.PostVendorInfo(Rec."Vendor No.", Rec."Menu Item No.", Rec.Quantity, Rec."Order Date", Rec."Menu Item Entry No.") then
+                            Rec.Status:= Rec.Status::"Sent to Vendor";
+                        CurrPage.Update(); 
+                    end else begin
+                        Message('Quantity must be field');
+                    end;
+                    
                 end;
             }
-            action("Mark Posted")
+            action("Check Posted")
             {
                 Promoted = true;
                 PromotedCategory = Process;
-                Image = "Invoicing-Send";
+                Image = Refresh;
                 ApplicationArea = All;
                 
                 trigger OnAction()
+                var 
+                    PrevRec: Record LunchOrderEntry;
                 begin
-                    Rec.Status:= Rec.Status::Posted;
-                    CurrPage.Update();
+                    if not Rec.IsEmpty then begin
+                        Rec.SetCurrentKey("Vendor No.");
+                        Rec.SetRange(Status,Rec.Status::"Sent to Vendor"); 
+                        if Rec.FindFirst() then begin
+                                repeat
+                                if Rec.Status=Rec.Status::"Sent to Vendor" then begin
+                                    if ApiPage.GetVendorInfo(Rec."Vendor No.", PrevRec."Vendor No.", Rec."Menu Item Entry No.") then
+                                        Rec.Status:= Rec.Status::Posted;
+                                        Rec.Modify();
+                                end;
+                                PrevRec:= Rec;
+                            until Rec.Next()=0; 
+                        end;
+                    end;
+                    Rec.Reset();
+                    Rec.SetCurrentKey("Order Date", "Vendor No.");
                 end;
             }
         }
     }
     var ExRecStatus: Record LunchOrderEntry;
         TypeControl: Text;
+        ApiPage: Page VendorApi;
     trigger OnAfterGetRecord()
     begin
         Rec.SetCurrentKey("Order Date");

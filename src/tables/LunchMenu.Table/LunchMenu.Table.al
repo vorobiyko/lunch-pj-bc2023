@@ -247,7 +247,7 @@ table 60102 LunchMenu
         HasSpyRec: Boolean;
         
     begin
-        CheckActiveRec();
+        CheckActiveRecord();
         SetOrderAmountItem();
         RecLunchMenu:= Rec;
         CheckDependTableIfEmpty(RecOrderEnt); 
@@ -266,7 +266,7 @@ table 60102 LunchMenu
                     end;
             until RecOrderEnt.Next()=0;
     end;
-    procedure CheckActiveRec()
+    procedure CheckActiveRecord()
     begin
         if Rec.CheckGroupHandler() then begin
             CurrRecEx:= Rec;
@@ -370,7 +370,7 @@ table 60102 LunchMenu
     procedure CheckDependTableIfEmpty(var CheckedDependTable: Record LunchOrderEntry)
     begin
         if not CheckedDependTable.FindFirst() then begin
-                Message('Have not orders');
+                
         end;
     end;
     procedure SetOrderAmountItem()
