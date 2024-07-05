@@ -66,13 +66,11 @@ table 60103 "Lunch Order Entry"
 
     keys
     {
-        key(PK; "Order Date", "Vendor No.", "Entry No.")
+        key(PK; "Entry No.")
         {
             Clustered = true;
         }
-        // key()
-        // {
-
-        // }
+        key(Key1; "Order Date"){}
+        key(Key2; "Vendor No."){}
     }
 }

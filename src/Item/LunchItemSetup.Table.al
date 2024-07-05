@@ -8,11 +8,13 @@ table 60121 "Item Setup"
          field(1; "Primary Key"; Code[10])
          {
              Caption = 'Primary Key';
+             NotBlank = true;
          }
           field(2; "Item Nos."; Code[20])
          {
              Caption = 'Item Nos.';
              TableRelation = "No. Series";
+             NotBlank = true;
          }
      }
      keys

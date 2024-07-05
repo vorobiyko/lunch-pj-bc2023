@@ -117,6 +117,9 @@ page 60103 "Lunch Order Entry"
             }
             action("Remove All Orders")
             {
+                ApplicationArea = All;
+                Promoted = true;
+                PromotedCategory = Process;
                 Image = "Invoicing-MDL-Delete";
                 trigger OnAction()
                 begin

@@ -7,22 +7,24 @@ table 60101 "Lunch Item"
 
     fields
     {
-        field(1; "Vendor No."; Code[20])
+        field(1; "Item No."; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Item No.';
+            NotBlank = true;
+        }
+        field(2; "Vendor No."; Code[20])
         {
             DataClassification = CustomerContent;
             Caption = 'Vendor No.';
             TableRelation = "Lunch Vendor";
             NotBlank = true;
         }
-        field(2; "Item No."; Code[20])
-        {
-            DataClassification = CustomerContent;
-            Caption = 'Item No.';
-        }
         field(3; Description; Text[250])
         {
             DataClassification = CustomerContent;
             Caption = 'Description';
+            NotBlank = true;
         }
         field(4; Weight; Decimal)
         {
@@ -55,6 +57,7 @@ table 60101 "Lunch Item"
         {
             DataClassification = CustomerContent;
             Caption = 'No. Series';
+            NotBlank = true;
         }
     }
 
