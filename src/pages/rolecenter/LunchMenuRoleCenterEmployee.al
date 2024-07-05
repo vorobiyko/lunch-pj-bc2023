@@ -13,7 +13,8 @@ page 60209 RoleCenterEmployee
     actions{
         area(processing){
             action("Lunch Order Menu"){
-                RunObject = page LunchOrder; 
+                RunObject = page LunchOrder;
+                RunPageMode = View;  
             }
         }
     }

@@ -70,6 +70,10 @@ table 60103 LunchOrderEntry
         {
             Clustered = true;
         }
+        // key()
+        // {
+
+        // }
     }
     
     fieldgroups

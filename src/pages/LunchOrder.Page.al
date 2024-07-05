@@ -7,6 +7,7 @@ page 60102 LunchOrder
     SourceTable = LunchMenu;
     CardPageId = LunchMenuEditCard;
     Editable = true;
+    InsertAllowed = false;
     AutoSplitKey = true;
     RefreshOnActivate = true;
 
@@ -80,7 +81,7 @@ page 60102 LunchOrder
                     ApplicationArea = All;
                     Caption = 'Menu Item Entry No.';
                     StyleExpr = TypeControl;
-                    // Visible = false;
+                    Visible = false;
                     Editable = false;
                 }
                 field("Active"; Rec.Active)

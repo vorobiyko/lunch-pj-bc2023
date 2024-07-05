@@ -19,16 +19,20 @@ page 60208 RoleCenterAdmin
     actions{
         area(Processing){
             action("Lunch Vendor List Page"){
-                RunObject = page LunchVendorList; 
+                RunObject = page LunchVendorList;
+                 RunPageMode = View;  
             }
             action("Lunch Item List Page"){
-                RunObject = page LunchItemList; 
+                RunObject = page LunchItemList;
+                 RunPageMode = View;  
             }
             action("Lunch Order Menu"){
-                RunObject = page LunchOrder; 
+                RunObject = page LunchOrder;
+                RunPageMode = View; 
             }
             action("Lunch Order Page"){
-                RunObject = page LunchOrderEntry; 
+                RunObject = page LunchOrderEntry;
+                 RunPageMode = View;  
             }
         }
         area(Reporting){

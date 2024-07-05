@@ -13,12 +13,12 @@ page 60133 LunchMenuEditCard
             group(General)
             {
                 Caption = 'Group Settings';
-                field("Line Type"; Rec."Line Type")
-                {
-                    ApplicationArea = all;
-                    Caption = 'Line Type';
-                    ValuesAllowed = "Group";
-                }
+                // field("Line Type"; Rec."Line Type")
+                // {
+                //     ApplicationArea = all;
+                //     Caption = 'Line Type';
+                //     ValuesAllowed = "Group";
+                // }
                 field("Menu Date"; Rec."Menu Date")
                 {
                     ApplicationArea = All;
@@ -89,6 +89,10 @@ page 60133 LunchMenuEditCard
    begin
     CurrPage.Update();
     ConnectorGrouptoItems();
+   end;
+   trigger OnNewRecord(BelowxRec: Boolean)
+   begin
+    Rec."Line Type":= Rec."Line Type"::Group;
    end;
    
    

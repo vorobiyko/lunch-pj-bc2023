@@ -1,76 +1,16 @@
 page 60109 VendorApi
 {
     PageType = Card;
-    ApplicationArea = All;
+    ApplicationArea = Basic, Suite;
     UsageCategory = Documents;
     Caption = 'Vendor Info Card';
     
-    layout
-    {
-        area(Content)
-        {
-            group(GeneralFastTab)
-            {
-                Caption = 'General';
-                field(Id;Id)
-                {
-                    ApplicationArea = All;
-                    Caption = 'ID';
-                }
-                field(OrderDate;OrderDate)
-                {
-                    ApplicationArea = All;
-                    Caption = 'OrderDate';
-                }
-                field(Item;Item)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Item';
-                }
-                field(Quantity;Quantity)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Quantity';
-                }
-                
-            }
-            
-        }
-    }
-    // actions
-    // {
-    //     area(Processing)
-    //     {
-    //         action(GetData)
-    //         {
-    //             ApplicationArea = All;
-    //             Image = GetOrder;
-    //             trigger OnAction()
-    //             begin
-    //                 GetVendorInfo();               
-    //             end;
-    //         }
-    //         action(PostVendor)
-    //         {
-    //             Image = Post;
-    //             trigger OnAction()
-    //             begin
-    //                 PostVendorInfo();
-    //             end;
-    //         }
-    //     }
-    // }
+   
     
     
     
-    var
-        Id: Integer;
-        OrderDate: Date;
-        Item: Code[20];
-        Quantity: Decimal;
-        Approved: Boolean;
-        MenuItemEntryNo: Text;
-        
+    
+    var    
         JSONDATA: JsonObject;
 
     procedure JSONParser(var JSON: JsonObject; MenuItemEntryNo: Integer):Boolean
@@ -105,12 +45,6 @@ page 60109 VendorApi
         until Iterator=DataObj.Count();
         exit(false);
     end;
-    // AttributeObj:= AttributeRes.AsObject();
-                    // AttributeObj.Get('ITMCode', ItemRes);
-                    // AttributeObj.Get('OrderDate',OrderDateRes);
-                    // AttributeObj.Get('Quantity', QuantityRes);
-                    // Id:= IdRes.AsValue().AsInteger();
-                    // Item:= ItemRes.AsValue().AsCode();
     procedure GetVendorInfo(var VendorNo: Code[20]; PrevVendor: Code[20]; MenuItemEntryNo: Integer):Boolean;
     var
         Client: HttpClient;
@@ -155,19 +89,6 @@ page 60109 VendorApi
                 if JsonResponse.ReadFrom(ResponseText) then begin
                     // Обробка відповіді JSON
                     exit(JSONParser(JsonResponse, MenuItemEntryNo))
-                    // DataObj:= DataRes.AsObject();
-                    // DataObj.Get('attributes', AttributeRes);
-                    // DataObj.Get('id', IdRes);
-                    // // IdObj:= IdRes.AsObject();
-                    // AttributeObj:= AttributeRes.AsObject();
-                    // AttributeObj.Get('ITMCode', ItemRes);
-                    // AttributeObj.Get('OrderDate',OrderDateRes);
-                    // AttributeObj.Get('Quantity', QuantityRes);
-                    // Id:= IdRes.AsValue().AsInteger();
-                    // Item:= ItemRes.AsValue().AsCode();
-                    // OrderDate:= OrderDateRes.AsValue().AsDate();
-                    // Quantity:= QuantityRes.AsValue().AsDecimal();
-                    // Message('Response: %1', Item);
                 end else begin
                     Message('Error parsing JSON response');
                     exit(false)
@@ -227,25 +148,11 @@ end;
         ContentHeaders.Remove('Content-Type');
         ContentHeaders.Add('Content-Type', 'application/json');
     
-        
     // Відправка запиту
         if Client.Send(RequestMessage, ResponseMessage) then begin
             if ResponseMessage.IsSuccessStatusCode then begin
                 ResponseMessage.Content.ReadAs(ResponseText);
                 if JsonResponse.ReadFrom(ResponseText) then begin
-                    // Обробка відповіді JSON
-                    // JsonResponse.Get('data', DataRes);
-                    // DataObj:= DataRes.AsObject();
-                    // DataObj.Get('attributes', AttributeRes);
-                    // DataObj.Get('id', IdRes);
-                    // AttributeObj:= AttributeRes.AsObject();
-                    // AttributeObj.Get('ITMCode', ItemRes);
-                    // AttributeObj.Get('OrderDate',OrderDateRes);
-                    // AttributeObj.Get('Quantity', QuantityRes);
-                    // Id:= IdRes.AsValue().AsInteger();
-                    // Item:= ItemRes.AsValue().AsCode();
-                    // OrderDate:= OrderDateRes.AsValue().AsDate();
-                    // Quantity:= QuantityRes.AsValue().AsDecimal();
                     Message('Record has been sent to Vendor');
                     exit(true);
                 end else begin
