@@ -88,7 +88,7 @@ table 60101 "Lunch Item"
         end;
     end;
 
-    procedure AssistEdit(OldExample: Record "Lunch Item"): Boolean
+    internal procedure AssistEdit(OldExample: Record "Lunch Item"): Boolean
     var
         "Lunch Item": Record "Lunch Item";
     begin

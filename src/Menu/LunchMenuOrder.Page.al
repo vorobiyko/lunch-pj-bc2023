@@ -144,7 +144,7 @@ page 60102 "Lunch Menu View"
                 Image = Add;
                 trigger OnAction()
                 begin
-                    AddRecordToOrder();
+                    ExLunchMenu.AddRecordToOrder(ExOrderEntry,ExOrderEntryLoop,IsNotEmpty,ExLunchMenu,ItemRec,IsRecExistOrderEntry);
                 end;
             }
         }
@@ -170,19 +170,19 @@ page 60102 "Lunch Menu View"
 
     trigger OnClosePage()
     begin
-        AddRecordToOrder();
-        ResetRecordQuantity();
+        ExLunchMenu.AddRecordToOrder(ExOrderEntry,ExOrderEntryLoop,IsNotEmpty,ExLunchMenu,ItemRec,IsRecExistOrderEntry);
+        ExLunchMenu.ResetRecordQuantity(ExLunchMenu);
     end;
 
     trigger OnAfterGetRecord()
     begin
-        SumParams();
+        ExLunchMenu.SumParams();
         GroupContol(Rec);
         CheckActiveRec(Rec);
         SetStyleStatusRec();
     end;
 
-    procedure SetSevenDaysFilter()
+    local procedure SetSevenDaysFilter()
     var
         StartDate: Date;
         EndDate: Date;
@@ -197,79 +197,7 @@ page 60102 "Lunch Menu View"
             Rec.SetFilter("Menu Date", '%2..%1', StartDate, EndDate);
         end;
     end;
-
-    procedure AddRecordToOrder()
-    begin
-        if ExOrderEntry.IsEmpty then begin
-            IsNotEmpty := false;
-        end else begin
-            IsNotEmpty := true;
-        end;
-        if Dialog.Confirm('Send Menu Items to Create Order?') then begin
-            ExLunchMenu.SetCurrentKey("Line No.");
-            ExOrderEntryLoop.SetCurrentKey("Entry No.");
-            repeat
-                if ExLunchMenu.CheckGroupHandler() then begin
-                    ItemRec.SetCurrentKey("Line No.");
-                    ItemRec.SetRange("Line No.", ExLunchMenu."Line No." + 1, ExLunchMenu."Line No." + 9999);
-                    if ItemRec.Count() > 0 then begin
-                        ItemRec.Next();
-                        repeat
-                            if IsNotEmpty then begin
-                                if IsRecExistOrderEntry then begin
-                                    IsRecExistOrderEntry := false;
-                                end;
-                                if ItemRec.Active = false then begin
-                                    IsRecExistOrderEntry := true;
-                                end;
-                                if (ExOrderEntryLoop.FindSet()) then begin
-                                    repeat
-                                        if ((ItemRec."Menu Item Entry No." = ExOrderEntryLoop."Menu Item Entry No.")) then begin
-                                            IsRecExistOrderEntry := true;
-                                            break;
-                                        end;
-                                    until ExOrderEntryLoop.Next() = 0;
-                                end;
-                            end;
-                            if IsRecExistOrderEntry = false then begin
-                                ExOrderEntry.Init();
-                                ExOrderEntry."Order Date" := ExLunchMenu."Menu Date";
-                                ExOrderEntry."Item Description" := ItemRec."Item Description";
-                                ExOrderEntry."Menu Item Entry No." := ItemRec."Menu Item Entry No.";
-                                ExOrderEntry."Menu Item No." := ItemRec."Item No.";
-                                ExOrderEntry.Price := ItemRec.Price;
-                                ExOrderEntry.Quantity := ItemRec."Order Quantity";
-                                ExOrderEntry.Status := ExOrderEntry.Status::Created;
-                                ExOrderEntry.Amount := ItemRec."Order Amount";
-                                ExOrderEntry."Vendor No." := ItemRec."Vendor No.";
-                                ExOrderEntry."Resource No." := UserId;
-                                if IsNotEmpty then begin
-                                    ExOrderEntryLoop.FindLast();
-                                    ExOrderEntry."Entry No." := ExOrderEntryLoop."Entry No." + 1;
-                                end else begin
-                                    ExOrderEntry."Entry No." := ExOrderEntry."Entry No." + 1;
-                                end;
-                                ExOrderEntry.Insert();
-                            end;
-                        until ItemRec.Next() = 0;
-                    end;
-                end;
-            until ExLunchMenu.Next() = 0;
-        end;
-    end;
-
-    procedure ResetRecordQuantity();
-    begin
-        ExLunchMenu := Rec;
-        ExLunchMenu.FindFirst();
-        repeat
-            ExLunchMenu."Order Quantity" := 0;
-            ExLunchMenu."Order Amount" := 0;
-            ExLunchMenu.Modify();
-        until ExLunchMenu.Next() = 0;
-    end;
-
-    procedure GroupContol(var LunchMenuRecord: Record "Lunch Menu"): Text;
+    local procedure GroupContol(var LunchMenuRecord: Record "Lunch Menu"): Text;
     var
         ExRecStatus: Record "Lunch Menu";
     begin
@@ -287,7 +215,7 @@ page 60102 "Lunch Menu View"
         exit(TypeControl);
     end;
 
-    procedure CheckActiveRec(var LunchMenuRecord: Record "Lunch Menu")
+    local procedure CheckActiveRec(var LunchMenuRecord: Record "Lunch Menu")
     var
         ExRecStatus: Record "Lunch Menu";
     begin
@@ -300,37 +228,9 @@ page 60102 "Lunch Menu View"
             end;
         end;
     end;
-
-    procedure SumParams()
-    var
-        ExRecSum: Record "Lunch Menu";
-        RecordGroup: Record "Lunch Menu";
-        TotalItemsPrice: Decimal;
-        TotalItemsWeight: Decimal;
-        TotalQuantity: Decimal;
+    local procedure SetStyleStatusRec()
     begin
-        ExRecSum := Rec;
-        ExRecSum.SetCurrentKey("Line No.");
-        if ExRecSum."Line Type" = ExRecSum."Line Type"::Group then begin
-            RecordGroup := ExRecSum;
-            ExRecSum.SetRange("Parent Menu Item Entry No.", RecordGroup."Menu Item Entry No.");
-            ExRecSum."Order Quantity" := 0;
-            repeat
-                TotalItemsPrice := ExRecSum."Order Amount" + TotalItemsPrice;
-                TotalItemsWeight := ExRecSum.Weight * ExRecSum."Order Quantity" + TotalItemsWeight;
-                TotalQuantity := ExRecSum."Order Quantity" + TotalQuantity;
-            until ExRecSum.Next() = 0;
-            ExRecSum."Order Amount" := TotalItemsPrice;
-            ExRecSum.Weight := TotalItemsWeight;
-            ExRecSum."Order Quantity" := TotalQuantity;
-            Rec."Order Amount" := ExRecSum."Order Amount";
-            Rec.Weight := ExRecSum.Weight;
-            Rec."Order Quantity" := ExRecSum."Order Quantity";
-        end;
-    end;
-
-    procedure SetStyleStatusRec()
-    begin
+        ColorStatus:= 'Standard';
         if not ExOrderEntry.IsEmpty then begin
             ExOrderEntry.FindFirst();
             repeat

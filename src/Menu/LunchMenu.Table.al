@@ -133,8 +133,7 @@ table 60102 "Lunch Menu"
         isAllowDeleteModify: Boolean;
 
     trigger OnInsert()
-    var
-        ExRec: Record "Lunch Menu";
+    var ExRec: Record "Lunch Menu";
         IsGroupLine: Boolean;
     begin
         Rec.SetCurrentKey("Line No.");
@@ -145,8 +144,7 @@ table 60102 "Lunch Menu"
     end;
 
     trigger OnDelete()
-    var
-        RecLunchMenu: Record "Lunch Menu";
+    var RecLunchMenu: Record "Lunch Menu";
         RecOrderEnt: Record "Lunch Order Entry";
         HasSpyRec: Boolean;
         SpyRec: Record "Lunch Menu";
@@ -204,9 +202,7 @@ table 60102 "Lunch Menu"
                 until RecLunchMenu.Next() = 0;
             end;
             // check spy rec
-            if (HasSpyRec) AND (SpyRec.Count > 0) then
-                SpyRec.Delete();
-
+            FindNotSendedtoOrderRec(HasSpyRec, SpyRec);
             // Check if needed Group
             if RecLunchMenu.Count() > 0 then begin
                 // Need Group
@@ -215,39 +211,15 @@ table 60102 "Lunch Menu"
                 // Needed delete Group
                 Rec.Delete();
             end;
-            ;
         end else begin
             // Item
             // If Rec in Orders
-            CheckDependTableIfEmpty(RecOrderEnt);
-            repeat
-                if ChekerDelModAllowedLunchMenu(RecLunchMenu, RecOrderEnt) then begin
-                    // Allow to delete. Order is empty;
-                    isAllowDeleteModify := true;
-                end else begin
-                    //Order has Rec
-                    if CheckPermissionToDelModRecord(RecLunchMenu, RecOrderEnt) then begin
-                        SyncDelete(RecLunchMenu, RecOrderEnt);
-                        isAllowDeleteModify := false;
-                    end else begin
-                        Message('%1 Sended to Vendor', RecLunchMenu."Item No.");
-                        isAllowDeleteModify := false;
-                    end;
-                    break;
-                end;
-            until RecOrderEnt.Next() = 0;
-            if isAllowDeleteModify then begin
-                Rec.Delete();
-            end else begin
-                AvoidDelete();
-            end;
-
+            DeleteItem(RecOrderEnt,RecLunchMenu);
+            DeleteHandler();
         end;
     end;
-
     trigger OnModify()
-    var
-        RecLunchMenu: Record "Lunch Menu";
+    var RecLunchMenu: Record "Lunch Menu";
         RecOrderEnt: Record "Lunch Order Entry";
         SpyRec: Record "Lunch Menu";
         HasSpyRec: Boolean;
@@ -272,8 +244,41 @@ table 60102 "Lunch Menu"
             end;
         until RecOrderEnt.Next() = 0;
     end;
-
-    procedure CheckActiveRecord()
+    local procedure DeleteItem(var RecOrderEnt: Record "Lunch Order Entry"; RecLunchMenu: Record "Lunch Menu")
+    begin
+        CheckDependTableIfEmpty(RecOrderEnt);
+        repeat
+            if ChekerDelModAllowedLunchMenu(RecLunchMenu, RecOrderEnt) then begin
+                // Allow to delete. Order is empty;
+                isAllowDeleteModify := true;
+            end else begin
+                //Order has Rec
+                if CheckPermissionToDelModRecord(RecLunchMenu, RecOrderEnt) then begin
+                    SyncDelete(RecLunchMenu, RecOrderEnt);
+                    isAllowDeleteModify := false;
+                end else begin
+                    Message('%1 Sended to Vendor', RecLunchMenu."Item No.");
+                    isAllowDeleteModify := false;
+                end;
+                break;
+            end;
+        until RecOrderEnt.Next() = 0;
+    end;
+    local procedure DeleteHandler()
+    begin
+        if isAllowDeleteModify then begin
+            Rec.Delete();
+        end else begin
+            AvoidDelete();
+        end;
+    end;
+    
+    local procedure FindNotSendedtoOrderRec(var HasSpyRec: Boolean; SpyRec: Record "Lunch Menu")
+    begin
+        if (HasSpyRec) AND (SpyRec.Count > 0) then
+            SpyRec.Delete();
+    end;
+    local procedure CheckActiveRecord()
     begin
         if Rec.CheckGroupHandler() then begin
             CurrRecEx := Rec;
@@ -286,10 +291,8 @@ table 60102 "Lunch Menu"
                 until CurrRecEx.Next() = 0;
             end;
         end;
-
     end;
-
-    procedure CheckPermissionToDelModRecord(var CheckLunnchMenu: Record "Lunch Menu"; var CheckOrder: Record "Lunch Order Entry"): Boolean;
+    local procedure CheckPermissionToDelModRecord(var CheckLunnchMenu: Record "Lunch Menu"; var CheckOrder: Record "Lunch Order Entry"): Boolean;
     begin
         if (CheckLunnchMenu."Menu Item Entry No." = CheckOrder."Menu Item Entry No.") and (CheckOrder.Status = CheckOrder.Status::Created) then begin
             // allow delete;
@@ -299,8 +302,7 @@ table 60102 "Lunch Menu"
             exit(false);
         end;
     end;
-
-    procedure ChekerDelModAllowedLunchMenu(var CheckLunnchMenu: Record "Lunch Menu"; var CheckOrder: Record "Lunch Order Entry"): Boolean;
+    local procedure ChekerDelModAllowedLunchMenu(var CheckLunnchMenu: Record "Lunch Menu"; var CheckOrder: Record "Lunch Order Entry"): Boolean;
     begin
         if (CheckLunnchMenu."Menu Item Entry No." = CheckOrder."Menu Item Entry No.") then begin
             exit(false);
@@ -311,11 +313,94 @@ table 60102 "Lunch Menu"
             // I Order not Rec/ you can delete modify
         end;
     end;
+    local procedure SetNewLineNo(var isGroup: Boolean)
+    var ExRecLocal: Record "Lunch Menu";
+        ExRecFunc: Record "Lunch Menu";
+        CurrentGroupLineNo: Integer;
+    begin
+        ExRecLocal := Rec;
+        ExRecLocal.SetCurrentKey("Line No.");
+        if isGroup then begin
+            SetLineNoGroup(ExRecLocal);
+        end else begin
+            repeat
+                if Rec."Parent Menu Item Entry No." = ExRecLocal."Menu Item Entry No." then begin
+                    SetLineNoItem(CurrentGroupLineNo,ExRecLocal,ExRecFunc);
+                end;
+            until ExRecLocal.Next() = 0;
+        end;
+    end;
+    local procedure SetLineNoItem(var CurrentGroupLineNo: Integer; ExRecLocal: Record "Lunch Menu";ExRecFunc: Record "Lunch Menu")
+    begin
+        CurrentGroupLineNo := ExRecLocal."Line No.";
+        ExRecFunc := ExRecLocal;
+        ExRecFunc.SetCurrentKey("Line No.");
+        ExRecFunc.SetRange("Line No.", CurrentGroupLineNo, ExRecLocal."Line No." + 9999);
+        if ExRecFunc.FindLast() then begin
+            repeat
+                Rec."Line No." := ExRecFunc."Line No." + 1;
+                Rec.Indentation := 1;
+                Rec."Menu Date" := ExRecFunc."Menu Date";
+                Rec.Active := ExRecFunc.Active;
+                exit;
+            until ExRecFunc.Next() = 0;
+        end;
+    end;
+    local procedure SetLineNoGroup(var ExRecLocal: Record "Lunch Menu")
+    begin
+        ExRecLocal.SetRange("Line Type", "Line Type"::Group);
+        if ExRecLocal.FindLast() then begin
+            repeat
+                Rec."Line No." := ExRecLocal."Line No." + 10000;
+                Rec.Indentation := 0;
+            until ExRecLocal.Next() = 0;
+        end; 
+    end;
+    local procedure SyncDelete(var RecMainTable: Record "Lunch Menu"; RecDependTable: Record "Lunch Order Entry")
+    begin
+        RecMainTable.Delete();
+        RecDependTable.Delete();
+    end;
+    local procedure AvoidDelete()
+    begin
+        Rec.Init();
+        Rec."Line No." := 10000 * Rec.Count();
+        Rec.Insert();
+    end;
+    local procedure CheckDependTableIfEmpty(var CheckedDependTable: Record "Lunch Order Entry")
+    begin
+        if not CheckedDependTable.FindFirst() then begin
+        end;
+    end;
 
-
-    procedure CheckGroupHandler(): Boolean;
-    var
-        isGroup: Boolean;
+    local procedure SetOrderAmountItem()
+    begin
+        Rec."Order Amount" := Rec."Order Quantity" * Rec.Price;
+    end;
+    
+    local procedure SetValue(var ExOrderEntry: Record "Lunch Order Entry";ExLunchMenu: Record "Lunch Menu";
+    ItemRec: Record "Lunch Menu";ExOrderEntryLoop: Record "Lunch Order Entry";IsNotEmpty: Boolean)
+    begin
+        ExOrderEntry.Init();
+        ExOrderEntry."Order Date" := ExLunchMenu."Menu Date";
+        ExOrderEntry."Item Description" := ItemRec."Item Description";
+        ExOrderEntry."Menu Item Entry No." := ItemRec."Menu Item Entry No.";
+        ExOrderEntry."Menu Item No." := ItemRec."Item No.";
+        ExOrderEntry.Price := ItemRec.Price;
+        ExOrderEntry.Quantity := ItemRec."Order Quantity";
+        ExOrderEntry.Status := ExOrderEntry.Status::Created;
+        ExOrderEntry."Vendor No." := ItemRec."Vendor No.";
+        ExOrderEntry."Resource No." := UserId;
+        if IsNotEmpty then begin
+            ExOrderEntryLoop.FindLast();
+            ExOrderEntry."Entry No." := ExOrderEntryLoop."Entry No." + 1;
+        end else begin
+            ExOrderEntry."Entry No." := ExOrderEntry."Entry No." + 1;
+        end;
+        ExOrderEntry.Insert();
+    end;
+    internal procedure CheckGroupHandler(): Boolean;
+    var isGroup: Boolean;
     begin
         CurrRecEx := Rec;
         if (CurrRecEx."Line Type" = CurrRecEx."Line Type"::Group) then begin
@@ -325,71 +410,88 @@ table 60102 "Lunch Menu"
         end;
         exit(isGroup);
     end;
-
-    procedure SetNewLineNo(var isGroup: Boolean)
-    var
-        ExRecLocal: Record "Lunch Menu";
-        ExRecFunc: Record "Lunch Menu";
-        CurrentGroupLineNo: Integer;
-    begin
-        ExRecLocal := Rec;
-        ExRecLocal.SetCurrentKey("Line No.");
-        if isGroup then begin
-            ExRecLocal.SetRange("Line Type", "Line Type"::Group);
-            if ExRecLocal.FindLast() then
-                repeat
-                    Rec."Line No." := ExRecLocal."Line No." + 10000;
-                    Rec.Indentation := 0;
-                until ExRecLocal.Next() = 0;
-        end else begin
-            repeat
-                if Rec."Parent Menu Item Entry No." = ExRecLocal."Menu Item Entry No." then begin
-                    CurrentGroupLineNo := ExRecLocal."Line No.";
-                    ExRecFunc := ExRecLocal;
-                    ExRecFunc.SetCurrentKey("Line No.");
-                    ExRecFunc.SetRange("Line No.", CurrentGroupLineNo, ExRecLocal."Line No." + 9999);
-                    if ExRecFunc.FindLast() then
-                        repeat
-                            Rec."Line No." := ExRecFunc."Line No." + 1;
-                            Rec.Indentation := 1;
-                            Rec."Menu Date" := ExRecFunc."Menu Date";
-                            Rec.Active := ExRecFunc.Active;
-                            exit;
-                        until ExRecFunc.Next() = 0;
-                end;
-            until ExRecLocal.Next() = 0;
-        end;
-    end;
-
-    procedure SetRangeGroup(var RecordGroup: Record "Lunch Menu"; MoveStep: Integer; GroupSize: Integer)
+    internal procedure SetRangeGroup(var RecordGroup: Record "Lunch Menu"; MoveStep: Integer; GroupSize: Integer)
     begin
         RecordGroup.SetCurrentKey("Line No.");
         RecordGroup.SetRange("Line No.", "Line No." + MoveStep, "Line No." + GroupSize);
     end;
-
-    procedure SyncDelete(var RecMainTable: Record "Lunch Menu"; RecDependTable: Record "Lunch Order Entry")
+    internal procedure SumParams()
+    var ExRecSum: Record "Lunch Menu";
+        RecordGroup: Record "Lunch Menu";
+        TotalItemsPrice: Decimal;
+        TotalItemsWeight: Decimal;
+        TotalQuantity: Decimal;
     begin
-        RecMainTable.Delete();
-        RecDependTable.Delete();
-    end;
-
-    procedure AvoidDelete()
-    begin
-        Rec.Init();
-        Rec."Line No." := 10000 * Rec.Count();
-        Rec.Insert();
-    end;
-
-    procedure CheckDependTableIfEmpty(var CheckedDependTable: Record "Lunch Order Entry")
-    begin
-        if not CheckedDependTable.FindFirst() then begin
-
+        ExRecSum := Rec;
+        ExRecSum.SetCurrentKey("Line No.");
+        if ExRecSum."Line Type" = ExRecSum."Line Type"::Group then begin
+            RecordGroup := ExRecSum;
+            ExRecSum.SetRange("Parent Menu Item Entry No.", RecordGroup."Menu Item Entry No.");
+            ExRecSum."Order Quantity" := 0;
+            repeat
+                TotalItemsPrice := ExRecSum."Order Amount" + TotalItemsPrice;
+                TotalItemsWeight := ExRecSum.Weight * ExRecSum."Order Quantity" + TotalItemsWeight;
+                TotalQuantity := ExRecSum."Order Quantity" + TotalQuantity;
+            until ExRecSum.Next() = 0;
+            ExRecSum."Order Amount" := TotalItemsPrice;
+            ExRecSum.Weight := TotalItemsWeight;
+            ExRecSum."Order Quantity" := TotalQuantity;
+            Rec."Order Amount" := ExRecSum."Order Amount";
+            Rec.Weight := ExRecSum.Weight;
+            Rec."Order Quantity" := ExRecSum."Order Quantity";
         end;
     end;
-
-    procedure SetOrderAmountItem()
+    internal procedure ResetRecordQuantity(var ExLunchMenu: Record "Lunch Menu");
     begin
-        Rec."Order Amount" := Rec."Order Quantity" * Rec.Price;
+        ExLunchMenu := Rec;
+        ExLunchMenu.FindFirst();
+        repeat
+            ExLunchMenu."Order Quantity" := 0;
+            ExLunchMenu."Order Amount" := 0;
+            ExLunchMenu.Modify();
+        until ExLunchMenu.Next() = 0;
     end;
-
+    internal procedure AddRecordToOrder(var ExOrderEntry: Record "Lunch Order Entry"; ExOrderEntryLoop: Record "Lunch Order Entry"; IsNotEmpty: Boolean; ExLunchMenu: Record "Lunch Menu";
+    ItemRec: Record "Lunch Menu"; IsRecExistOrderEntry: Boolean)
+    begin
+        if ExOrderEntry.IsEmpty then begin
+            IsNotEmpty := false;
+        end else begin
+            IsNotEmpty := true;
+        end;
+        if Dialog.Confirm('Send Menu Items to Create Order?') then begin
+            ExLunchMenu.SetCurrentKey("Line No.");
+            ExOrderEntryLoop.SetCurrentKey("Entry No.");
+            repeat
+                if ExLunchMenu.CheckGroupHandler() then begin
+                    ItemRec.SetCurrentKey("Line No.");
+                    ItemRec.SetRange("Line No.", ExLunchMenu."Line No." + 1, ExLunchMenu."Line No." + 9999);
+                    if ItemRec.Count() > 0 then begin
+                        ItemRec.Next();
+                        repeat
+                            if IsNotEmpty then begin
+                                if IsRecExistOrderEntry then begin
+                                    IsRecExistOrderEntry := false;
+                                end;
+                                if ItemRec.Active = false then begin
+                                    IsRecExistOrderEntry := true;
+                                end;
+                                if (ExOrderEntryLoop.FindSet()) then begin
+                                    repeat
+                                        if ((ItemRec."Menu Item Entry No." = ExOrderEntryLoop."Menu Item Entry No.")) then begin
+                                            IsRecExistOrderEntry := true;
+                                            break;
+                                        end;
+                                    until ExOrderEntryLoop.Next() = 0;
+                                end;
+                            end;
+                            if IsRecExistOrderEntry = false then begin
+                                SetValue(ExOrderEntry,ExLunchMenu,ItemRec,ExOrderEntryLoop,IsNotEmpty);
+                            end;
+                        until ItemRec.Next() = 0;
+                    end;
+                end;
+            until ExLunchMenu.Next() = 0;
+        end;
+    end;    
 }

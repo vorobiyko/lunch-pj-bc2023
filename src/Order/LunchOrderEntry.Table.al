@@ -73,4 +73,9 @@ table 60103 "Lunch Order Entry"
         key(Key1; "Order Date"){}
         key(Key2; "Vendor No."){}
     }
+    internal procedure CalcAmount()
+    begin
+        Rec.Amount:= Rec.Price*Rec.Quantity;
+        Modify();
+    end; 
 }

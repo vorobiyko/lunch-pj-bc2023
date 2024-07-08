@@ -137,9 +137,10 @@ page 60103 "Lunch Order Entry"
     begin
         Rec.SetCurrentKey("Order Date");
         StatusStyleControl();
+        ExRecStatus.CalcAmount();
     end;
 
-    procedure StatusStyleControl()
+    local procedure StatusStyleControl()
     begin
         ExRecStatus := Rec;
         case ExRecStatus."Status" of

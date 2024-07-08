@@ -76,21 +76,10 @@ page 60133 "Lunch Menu Creater"
     trigger OnOpenPage()
     begin
         CurrPage.Update();
-        ConnectorGrouptoItems();
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         Rec."Line Type" := Rec."Line Type"::Group;
     end;
-
-
-    procedure ConnectorGrouptoItems()
-    var
-        RecLunchMenuL: Record "Lunch Menu";
-    begin
-
-
-
-    end;
-}
+} 
