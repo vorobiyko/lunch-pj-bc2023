@@ -5,6 +5,11 @@ page 60109 "Vendor API"
 
     var
         JSONDATA: JsonObject;
+        LabelResponse: Label 'Error parsing JSON response';
+        LabelStatusCode: Label 'Error: %1 %2';
+        LabelReq: Label 'Failed to send request';
+
+
 
     local procedure JSONParser(var JSON: JsonObject; MenuItemEntryNo: Integer): Boolean
     var
@@ -67,16 +72,13 @@ page 60109 "Vendor API"
                 if JsonResponse.ReadFrom(ResponseText) then begin
                     exit(JSONParser(JsonResponse, MenuItemEntryNo))
                 end else begin
-                    Message('Error parsing JSON response');
-                    exit(false)
+                    Error(LabelResponse);
                 end;
             end else begin
-                Message('Error: %1 %2', ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase);
-                exit(false);
+                Error(LabelStatusCode, ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase);
             end;
         end else begin
-            Message('Failed to send request');
-            exit(false);
+            Error(LabelReq);
         end;
     end;
 
@@ -118,16 +120,13 @@ page 60109 "Vendor API"
                     Message('Record has been sent to Vendor');
                     exit(true);
                 end else begin
-                    Message('Error parsing JSON response');
-                    exit(false);
+                    Error(LabelResponse);
                 end;
             end else begin
-                Message('Error: %1 %2', ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase);
-                exit(false);
+                Error(LabelStatusCode, ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase);
             end;
         end else begin
-            Message('Failed to send request');
-            exit(false);
+            Error(LabelReq);
         end;
     end;
 

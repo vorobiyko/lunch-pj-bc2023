@@ -156,7 +156,8 @@ table 60102 "Lunch Menu"
             SetRangeGroup(RecLunchMenu, 1, 9999);
             RecLunchMenu.Next();
             // Checked has Rec how you want delete in OrderTable
-            CheckDependTableIfEmpty(RecOrderEnt);
+            if not RecOrderEnt.IsEmpty then
+                RecOrderEnt.FindFirst();
             repeat
                 repeat
                     if ChekerDelModAllowedLunchMenu(RecLunchMenu, RecOrderEnt) then begin
@@ -180,7 +181,6 @@ table 60102 "Lunch Menu"
             end else begin
                 // Check more ...
                 RecLunchMenu.FindFirst();
-                RecOrderEnt.FindFirst();
                 repeat
                     repeat
                         if CheckPermissionToDelModRecord(RecLunchMenu, RecOrderEnt) then begin
@@ -228,7 +228,8 @@ table 60102 "Lunch Menu"
         CheckActiveRecord();
         SetOrderAmountItem();
         RecLunchMenu := Rec;
-        CheckDependTableIfEmpty(RecOrderEnt);
+        if not RecOrderEnt.IsEmpty then
+                RecOrderEnt.FindFirst();
         repeat
             if ChekerDelModAllowedLunchMenu(RecLunchMenu, RecOrderEnt) then begin
                 // Allow to delete. Order is empty;
@@ -246,7 +247,8 @@ table 60102 "Lunch Menu"
     end;
     local procedure DeleteItem(var RecOrderEnt: Record "Lunch Order Entry"; RecLunchMenu: Record "Lunch Menu")
     begin
-        CheckDependTableIfEmpty(RecOrderEnt);
+        if not RecOrderEnt.IsEmpty then
+                RecOrderEnt.FindFirst();
         repeat
             if ChekerDelModAllowedLunchMenu(RecLunchMenu, RecOrderEnt) then begin
                 // Allow to delete. Order is empty;
@@ -367,19 +369,13 @@ table 60102 "Lunch Menu"
         Rec."Line No." := 10000 * Rec.Count();
         Rec.Insert();
     end;
-    local procedure CheckDependTableIfEmpty(var CheckedDependTable: Record "Lunch Order Entry")
-    begin
-        if not CheckedDependTable.FindFirst() then begin
-        end;
-    end;
-
     local procedure SetOrderAmountItem()
     begin
         Rec."Order Amount" := Rec."Order Quantity" * Rec.Price;
     end;
     
     local procedure SetValue(var ExOrderEntry: Record "Lunch Order Entry";ExLunchMenu: Record "Lunch Menu";
-    ItemRec: Record "Lunch Menu";ExOrderEntryLoop: Record "Lunch Order Entry";IsNotEmpty: Boolean)
+        ItemRec: Record "Lunch Menu";ExOrderEntryLoop: Record "Lunch Order Entry";IsNotEmpty: Boolean)
     begin
         ExOrderEntry.Init();
         ExOrderEntry."Order Date" := ExLunchMenu."Menu Date";
