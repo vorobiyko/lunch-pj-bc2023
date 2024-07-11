@@ -54,7 +54,7 @@ table 60103 "Lunch Order Entry"
         field(10; Amount; Decimal)
         {
             DataClassification = CustomerContent;
-            Caption = 'Amount';
+            Caption = 'Amount'; 
         }
         field(11; Status; Option)
         {
@@ -73,9 +73,25 @@ table 60103 "Lunch Order Entry"
         key(Key1; "Order Date"){}
         key(Key2; "Vendor No."){}
     }
-    internal procedure CalcAmount()
+    var LabelIsOrderSend: Label 'Order %1 was sent';
+        LabelQuantityErr: Label 'Quantity must be field %1';
+    internal procedure PostSelectedHandler(var SelectedRec: Record "Lunch Order Entry"; ApiPage: Page "Vendor API")
     begin
-        Rec.Amount:= Rec.Price*Rec.Quantity;
-        Modify();
+        SelectedRec.FindFirst();
+        
+            repeat
+                if (SelectedRec.Quantity <> 0) then begin
+                    if SelectedRec.Status= SelectedRec.Status::Created then begin
+                        if ApiPage.PostVendorInfo(SelectedRec."Vendor No.", SelectedRec."Menu Item No.", SelectedRec.Quantity, SelectedRec."Order Date", SelectedRec."Menu Item Entry No.") then
+                                SelectedRec.Status:= SelectedRec.Status::"Sent to Vendor";
+                                SelectedRec.Modify();
+                        end else begin
+                            Error(LabelIsOrderSend, SelectedRec."Menu Item Entry No.");
+                        end;  
+                        end else begin
+                Error('Quantity must be field %1', SelectedRec."Menu Item Entry No.");
+                end;
+            until SelectedRec.Next()= 0;
     end; 
+    
 }

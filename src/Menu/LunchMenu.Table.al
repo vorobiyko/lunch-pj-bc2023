@@ -131,6 +131,7 @@ table 60102 "Lunch Menu"
         ExOrderEntryTable: Record "Lunch Order Entry";
         RecCurrOrderTable: Record "Lunch Order Entry";
         isAllowDeleteModify: Boolean;
+        LabelIsSended: Label '%1 Sended to Vendor';
 
     trigger OnInsert()
     var ExRec: Record "Lunch Menu";
@@ -237,9 +238,10 @@ table 60102 "Lunch Menu"
                 //Order has Rec
                 if CheckPermissionToDelModRecord(RecLunchMenu, RecOrderEnt) then begin
                     RecOrderEnt.Quantity := RecLunchMenu."Order Quantity";
+                    RecOrderEnt.Amount:= RecLunchMenu."Order Amount";
                     RecOrderEnt.Modify();
                 end else begin
-                    Message('%1 Sended to Vendor', RecLunchMenu."Item No.");
+                    Error(LabelIsSended, RecLunchMenu."Item No.");
                 end;
                 break;
             end;
@@ -259,7 +261,7 @@ table 60102 "Lunch Menu"
                     SyncDelete(RecLunchMenu, RecOrderEnt);
                     isAllowDeleteModify := false;
                 end else begin
-                    Message('%1 Sended to Vendor', RecLunchMenu."Item No.");
+                    Message(LabelIsSended, RecLunchMenu."Item No.");
                     isAllowDeleteModify := false;
                 end;
                 break;
@@ -387,6 +389,7 @@ table 60102 "Lunch Menu"
         ExOrderEntry.Status := ExOrderEntry.Status::Created;
         ExOrderEntry."Vendor No." := ItemRec."Vendor No.";
         ExOrderEntry."Resource No." := UserId;
+        ExOrderEntry.Amount:= ItemRec."Order Amount";
         if IsNotEmpty then begin
             ExOrderEntryLoop.FindLast();
             ExOrderEntry."Entry No." := ExOrderEntryLoop."Entry No." + 1;

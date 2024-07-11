@@ -8,6 +8,8 @@ page 60109 "Vendor API"
         LabelResponse: Label 'Error parsing JSON response';
         LabelStatusCode: Label 'Error: %1 %2';
         LabelReq: Label 'Failed to send request';
+        LabelSuccessPost: Label 'Record %1 has been sent to Vendor';
+
 
 
 
@@ -117,7 +119,7 @@ page 60109 "Vendor API"
             if ResponseMessage.IsSuccessStatusCode then begin
                 ResponseMessage.Content.ReadAs(ResponseText);
                 if JsonResponse.ReadFrom(ResponseText) then begin
-                    Message('Record has been sent to Vendor');
+                    Message(LabelSuccessPost,MenuItemEntryNo);
                     exit(true);
                 end else begin
                     Error(LabelResponse);

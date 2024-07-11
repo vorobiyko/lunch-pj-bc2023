@@ -181,6 +181,10 @@ page 60102 "Lunch Menu View"
         CheckActiveRec(Rec);
         SetStyleStatusRec();
     end;
+    trigger OnNewRecord(BelowxRec: Boolean)
+    begin
+        CurrPage.Update(false);
+    end;
 
     local procedure SetSevenDaysFilter()
     var

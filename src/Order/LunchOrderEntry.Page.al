@@ -8,6 +8,7 @@ page 60103 "Lunch Order Entry"
     SourceTableView = sorting("Order Date") order(descending);
     Editable = false;
     InsertAllowed = false;
+    RefreshOnActivate = true;
 
     layout
     {
@@ -76,14 +77,7 @@ page 60103 "Lunch Order Entry"
 
                 trigger OnAction()
                 begin
-                    if (Rec.Quantity <> 0) then begin
-                        if ApiPage.PostVendorInfo(Rec."Vendor No.", Rec."Menu Item No.", Rec.Quantity, Rec."Order Date", Rec."Menu Item Entry No.") then
-                            Rec.Status := Rec.Status::"Sent to Vendor";
-                        CurrPage.Update();
-                    end else begin
-                        Message('Quantity must be field');
-                    end;
-
+                    PostSelectedOrder();
                 end;
             }
             action("Check Posted")
@@ -134,12 +128,14 @@ page 60103 "Lunch Order Entry"
         ApiPage: Page "Vendor API";
 
     trigger OnAfterGetRecord()
+    begin 
+        StatusStyleControl();
+    end;
+    trigger OnOpenPage()
     begin
         Rec.SetCurrentKey("Order Date");
-        StatusStyleControl();
-        ExRecStatus.CalcAmount();
     end;
-
+    
     local procedure StatusStyleControl()
     begin
         ExRecStatus := Rec;
@@ -158,5 +154,14 @@ page 60103 "Lunch Order Entry"
                 end;
 
         end;
+    end;
+    local procedure PostSelectedOrder()
+    var SelectedRec: Record "Lunch Order Entry";
+    begin
+        SelectedRec:= Rec;
+        CurrPage.SetSelectionFilter(SelectedRec);
+        SelectedRec.PostSelectedHandler(SelectedRec, ApiPage);
+        CurrPage.Update();
+             
     end;
 }

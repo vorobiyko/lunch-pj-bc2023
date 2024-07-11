@@ -43,7 +43,7 @@ page 60211 "Lunch Order Entry Today View"
         Rec.SetFilter("Order Date", '=%1', System.Today());
         CurrRec.FindFirst();
         repeat
-            SumPrice := CurrRec.Price + SumPrice;
+            SumPrice := CurrRec.Price*CurrRec.Quantity + SumPrice;
         until CurrRec.Next() = 0;
     end;
 }
