@@ -79,7 +79,6 @@ table 60101 "Lunch Item"
         if "Item No." = '' then begin
             ItemSetup.Get();
             ItemSetup.TestField("Item Nos.");
-            // some damn thing with the starting data hard to understand the arguments
             NoSeriesManagement.InitSeries("ItemSetup"."Item Nos.",
                                         xRec."No. Series",
                                         0D,

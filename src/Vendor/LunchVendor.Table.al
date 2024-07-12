@@ -52,7 +52,6 @@ table 60104 "Lunch Vendor"
         if "Vendor No." = '' then begin
             VendorSetup.Get();
             VendorSetup.TestField("Vendor Nos.");
-            // some damn thing with the starting data hard to understand the arguments
             NoSeriesManagement.InitSeries("VendorSetup"."Vendor Nos.",
                                         xRec."No. Series",
                                         0D,
