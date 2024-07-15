@@ -86,10 +86,10 @@ table 60103 "Lunch Order Entry"
                                 SelectedRec.Status:= SelectedRec.Status::"Sent to Vendor";
                                 SelectedRec.Modify();
                         end else begin
-                            Error(LabelIsOrderSend, SelectedRec."Menu Item Entry No.");
+                            Message(LabelIsOrderSend, SelectedRec."Menu Item Entry No.");
                         end;  
                         end else begin
-                Error('Quantity must be field %1', SelectedRec."Menu Item Entry No.");
+                Message('Quantity must be field %1', SelectedRec."Menu Item Entry No.");
                 end;
             until SelectedRec.Next()= 0;
     end; 

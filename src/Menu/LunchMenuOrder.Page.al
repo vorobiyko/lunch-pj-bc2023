@@ -179,7 +179,8 @@ page 60102 "Lunch Menu View"
         ExLunchMenu.SumParams();
         GroupContol(Rec);
         CheckActiveRec(Rec);
-        SetStyleStatusRec();
+        if not ExOrderEntry.IsEmpty then
+            SetStyleStatusRec();
     end;
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
@@ -210,9 +211,11 @@ page 60102 "Lunch Menu View"
             ExRecStatus."Line Type"::"Group":
                 begin
                     TypeControl := 'Strong';
+                    ColorStatus := 'Strong';
                     IsCanModifyQuantityGroup := false;
                 end else begin
                 TypeControl := 'Standart';
+                ColorStatus := 'Standart';
                 IsCanModifyQuantityGroup := true;
             end;
         end;
@@ -235,30 +238,28 @@ page 60102 "Lunch Menu View"
     local procedure SetStyleStatusRec()
     begin
         ColorStatus:= 'Standard';
-        if not ExOrderEntry.IsEmpty then begin
-            ExOrderEntry.FindFirst();
-            repeat
-                if Rec."Menu Item Entry No." = ExOrderEntry."Menu Item Entry No." then begin
-                    case ExOrderEntry."Status" of
-                        ExOrderEntry."Status"::"Sent to Vendor":
-                            begin
-                                ColorStatus := 'StrongAccent';
-                                IsCanModifyQuantityGroup := false;
-                            end;
-                        ExOrderEntry.Status::Posted:
-                            begin
-                                ColorStatus := 'Favorable';
-                                IsCanModifyQuantityGroup := false;
-                            end;
-                        ExOrderEntry.Status::Created:
-                            begin
-                                ColorStatus := 'Standard';
-                            end;
-                    end;
+        ExOrderEntry.FindFirst();
+        repeat
+            if Rec."Menu Item Entry No." = ExOrderEntry."Menu Item Entry No." then begin
+                case ExOrderEntry."Status" of
+                    ExOrderEntry."Status"::"Sent to Vendor":
+                        begin
+                            ColorStatus := 'StrongAccent';
+                            IsCanModifyQuantityGroup := false;
+                        end;
+                    ExOrderEntry.Status::Posted:
+                        begin
+                            ColorStatus := 'Favorable';
+                            IsCanModifyQuantityGroup := false;
+                        end;
+                    ExOrderEntry.Status::Created:
+                        begin
+                            ColorStatus := 'Standard';
+                        end;
                 end;
-                if Rec."Line Type" = Rec."Line Type"::Group then
-                    ColorStatus := 'Strong';
-            until ExOrderEntry.Next() = 0;
-        end;
+            end;
+            if Rec."Line Type" = Rec."Line Type"::Group then
+                ColorStatus := 'Strong';
+        until ExOrderEntry.Next() = 0;
     end;
 }
