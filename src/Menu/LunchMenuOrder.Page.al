@@ -144,7 +144,11 @@ page 60102 "Lunch Menu View"
                 Image = Add;
                 trigger OnAction()
                 begin
-                    ExLunchMenu.AddRecordToOrder(ExOrderEntry,ExOrderEntryLoop,IsNotEmpty,ExLunchMenu,ItemRec,IsRecExistOrderEntry);
+                    ExLunchMenu.AddRecordToOrder(ExOrderEntry,
+                                                 ExOrderEntryLoop,
+                                                 IsNotEmpty,
+                                                 ExLunchMenu,
+                                                 IsRecExistOrderEntry);
                 end;
             }
         }
@@ -170,7 +174,11 @@ page 60102 "Lunch Menu View"
 
     trigger OnClosePage()
     begin
-        ExLunchMenu.AddRecordToOrder(ExOrderEntry,ExOrderEntryLoop,IsNotEmpty,ExLunchMenu,ItemRec,IsRecExistOrderEntry);
+        ExLunchMenu.AddRecordToOrder(ExOrderEntry,
+                                     ExOrderEntryLoop,
+                                     IsNotEmpty,
+                                     ExLunchMenu,
+                                     IsRecExistOrderEntry);
         ExLunchMenu.ResetRecordQuantity(ExLunchMenu);
     end;
 

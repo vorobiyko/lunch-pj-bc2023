@@ -47,7 +47,9 @@ page 60109 "Vendor API"
         exit(false);
     end;
 
-    internal procedure GetVendorInfo(var VendorNo: Code[20]; PrevVendor: Code[20]; MenuItemEntryNo: Integer): Boolean;
+    internal procedure GetVendorInfo(var VendorNo: Code[20];
+                                         PrevVendor: Code[20];
+                                         MenuItemEntryNo: Integer): Boolean;
     var
         Client: HttpClient;
         RequestMessage: HttpRequestMessage;
@@ -85,7 +87,11 @@ page 60109 "Vendor API"
     end;
 
 
-    internal procedure PostVendorInfo(var VendorNo: Code[20]; ItemNo: Code[20]; Quantity: Decimal; OrderDate: Date; MenuItemEntryNo: Integer): Boolean
+    internal procedure PostVendorInfo(var VendorNo: Code[20];
+                                          ItemNo: Code[20];
+                                          Quantity: Decimal;
+                                          OrderDate: Date;
+                                          MenuItemEntryNo: Integer): Boolean
     var
         Client: HttpClient;
         RequestMessage: HttpRequestMessage;
