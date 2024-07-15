@@ -243,10 +243,12 @@ page 60102 "Lunch Menu View"
                         ExOrderEntry."Status"::"Sent to Vendor":
                             begin
                                 ColorStatus := 'StrongAccent';
+                                IsCanModifyQuantityGroup := false;
                             end;
                         ExOrderEntry.Status::Posted:
                             begin
                                 ColorStatus := 'Favorable';
+                                IsCanModifyQuantityGroup := false;
                             end;
                         ExOrderEntry.Status::Created:
                             begin
