@@ -491,6 +491,8 @@ table 60102 "Lunch Menu"
                     end;
                     if ExLunchMenu.Active = false then begin
                         IsRecExistOrderEntry := true;
+                    end else if ((ExLunchMenu.Active) and (not IsNotEmpty)) then begin
+                        IsRecExistOrderEntry := false;
                     end;
                     if IsRecExistOrderEntry = false then begin
                         SetValue(ExOrderEntry,ExLunchMenu,ExOrderEntryLoop,IsNotEmpty);
