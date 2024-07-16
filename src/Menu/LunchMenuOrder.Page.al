@@ -137,6 +137,16 @@ page 60102 "Lunch Menu View"
                 PromotedCategory = Process;
                 RunObject = page "Lunch Menu Creater";
             }
+            action("Show History")
+            {
+                Promoted = true;
+                PromotedCategory = Process;
+                Image = History;
+                trigger OnAction()
+                begin
+                    Rec.SetFilter("Menu Date", '');
+                end;
+            }
             action("Create orders")
             {
                 Promoted = true;
@@ -157,7 +167,6 @@ page 60102 "Lunch Menu View"
         TypeControl: Text;
         ColorStatus: Text;
         ExLunchMenu: Record "Lunch Menu";
-        ItemRec: Record "Lunch Menu";
         ExOrderEntry: Record "Lunch Order Entry";
         ExOrderEntryLoop: Record "Lunch Order Entry";
         IsRecExistOrderEntry: Boolean;
@@ -169,7 +178,7 @@ page 60102 "Lunch Menu View"
     begin
         Rec.SetCurrentKey("Line No.");
         Rec.SetAscending("Line No.", false);
-        SetSevenDaysFilter();
+        SetDateFilter();
     end;
 
     trigger OnClosePage()
@@ -195,7 +204,7 @@ page 60102 "Lunch Menu View"
         CurrPage.Update(false);
     end;
 
-    local procedure SetSevenDaysFilter()
+    local procedure SetDateFilter()
     var
         StartDate: Date;
         EndDate: Date;
@@ -205,9 +214,9 @@ page 60102 "Lunch Menu View"
         if not LastRecLunch.IsEmpty then begin
             LastRecLunch.SetCurrentKey("Menu Date");
             LastRecLunch.FindLast();
-            StartDate := LastRecLunch."Menu Date";
-            EndDate := StartDate - 7;
-            Rec.SetFilter("Menu Date", '%2..%1', StartDate, EndDate);
+            StartDate := System.Today;
+            EndDate := StartDate + 1;
+            Rec.SetFilter("Menu Date", '%1..%2', StartDate, EndDate);
         end;
     end;
     local procedure GroupContol(var LunchMenuRecord: Record "Lunch Menu"): Text;

@@ -111,6 +111,16 @@ page 60103 "Lunch Order Entry"
                     Rec.SetCurrentKey("Order Date", "Vendor No.");
                 end;
             }
+            action("Show History")
+            {
+                Promoted = true;
+                PromotedCategory = Process;
+                Image = History;
+                trigger OnAction()
+                begin
+                    Rec.SetFilter("Order Date", '');
+                end;
+            }
             action("Remove All Orders")
             {
                 ApplicationArea = All;
@@ -136,6 +146,7 @@ page 60103 "Lunch Order Entry"
     trigger OnOpenPage()
     begin
         Rec.SetCurrentKey("Order Date");
+        SetDateFilter();
     end;
     
     local procedure StatusStyleControl()
@@ -165,5 +176,19 @@ page 60103 "Lunch Order Entry"
         SelectedRec.PostSelectedHandler(SelectedRec, ApiPage);
         CurrPage.Update();
              
+    end;
+    local procedure SetDateFilter()
+    var
+        StartDate: Date;
+        EndDate: Date;
+    begin
+        ExRecStatus := Rec;
+        if not ExRecStatus.IsEmpty then begin
+            ExRecStatus.SetCurrentKey("Order Date");
+            ExRecStatus.FindLast();
+            StartDate := System.Today;
+            EndDate := StartDate + 1;
+            Rec.SetFilter("Order Date", '%1..%2', StartDate, EndDate);
+        end;
     end;
 }

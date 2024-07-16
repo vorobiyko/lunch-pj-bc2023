@@ -9,10 +9,7 @@ page 60109 "Vendor API"
         LabelStatusCode: Label 'Error: %1 %2';
         LabelReq: Label 'Failed to send request';
         LabelSuccessPost: Label 'Record %1 has been sent to Vendor';
-
-
-
-
+        
     local procedure JSONParser(var JSON: JsonObject; MenuItemEntryNo: Integer): Boolean
     var
         DataRes: JsonToken;
