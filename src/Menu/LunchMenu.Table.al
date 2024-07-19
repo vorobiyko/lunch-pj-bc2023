@@ -158,7 +158,7 @@ table 60102 "Lunch Menu"
             RecLunchMenu.Next();
             // Checked has Rec how you want delete in OrderTable
             if not RecOrderEnt.IsEmpty then
-                RecOrderEnt.FindFirst();
+                RecOrderEnt.FindSet();
             repeat
                 repeat
                     if ChekerDelModAllowedLunchMenu(RecLunchMenu, RecOrderEnt) then begin
@@ -181,7 +181,7 @@ table 60102 "Lunch Menu"
                 exit;
             end else begin
                 // Check more ...
-                RecLunchMenu.FindFirst();
+                RecLunchMenu.FindSet();
                 repeat
                     repeat
                         if CheckPermissionToDelModRecord(RecLunchMenu, RecOrderEnt) then begin
@@ -230,7 +230,7 @@ table 60102 "Lunch Menu"
         SetOrderAmountItem();
         RecLunchMenu := Rec;
         if not RecOrderEnt.IsEmpty then
-                RecOrderEnt.FindFirst();
+                RecOrderEnt.FindSet();
         repeat
             if ChekerDelModAllowedLunchMenu(RecLunchMenu, RecOrderEnt) then begin
                 // Allow to delete. Order is empty;
@@ -250,7 +250,7 @@ table 60102 "Lunch Menu"
     local procedure DeleteItem(var RecOrderEnt: Record "Lunch Order Entry"; RecLunchMenu: Record "Lunch Menu")
     begin
         if not RecOrderEnt.IsEmpty then
-                RecOrderEnt.FindFirst();
+                RecOrderEnt.FindSet();
         repeat
             if ChekerDelModAllowedLunchMenu(RecLunchMenu, RecOrderEnt) then begin
                 // Allow to delete. Order is empty;
@@ -287,7 +287,7 @@ table 60102 "Lunch Menu"
         if Rec.CheckGroupHandler() then begin
             CurrRecEx := Rec;
             CurrRecEx.SetRangeGroup(CurrRecEx, 1, 9999);
-            if CurrRecEx.FindFirst() then begin
+            if CurrRecEx.FindSet() then begin
                 repeat
                     CurrRecEx."Menu Date" := Rec."Menu Date";
                     CurrRecEx.Active := Rec.Active;
@@ -452,7 +452,7 @@ table 60102 "Lunch Menu"
     internal procedure ResetRecordQuantity(var ExLunchMenu: Record "Lunch Menu");
     begin
         ExLunchMenu := Rec;
-        ExLunchMenu.FindFirst();
+        ExLunchMenu.FindSet();
         repeat
             ExLunchMenu."Order Quantity" := 0;
             ExLunchMenu."Order Amount" := 0;

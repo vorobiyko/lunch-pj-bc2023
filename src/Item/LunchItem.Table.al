@@ -59,6 +59,9 @@ table 60101 "Lunch Item"
             Caption = 'No. Series';
             NotBlank = true;
         }
+        field(10; Media; Media)
+        {
+        }
     }
 
     keys
@@ -68,6 +71,13 @@ table 60101 "Lunch Item"
             Clustered = true;
         }
     }
+     fieldgroups
+    {
+        fieldgroup(Brick; "Item No.", Description, "Vendor No.", Media, Price, Weight)
+        {
+            
+        }
+    }
     var
         NoSeriesManagement: Codeunit NoSeriesManagement;
         ItemSetup: Record "Item Setup";
@@ -75,6 +85,8 @@ table 60101 "Lunch Item"
 
     //  to initialize the number series.
     trigger OnInsert();
+    var
+        BlobObj: InStream;
     begin
         if "Item No." = '' then begin
             ItemSetup.Get();
@@ -85,6 +97,18 @@ table 60101 "Lunch Item"
                                         "Item No.",
                                         "No. Series");
         end;
+        Rec.Picture.CreateInStream(BlobObj);
+        if BlobObj.Length > 0 then
+            Rec.Media.ImportStream(BlobObj, 'Demo image for item');
+    end;
+    
+    trigger OnModify()
+    var
+        BlobObj: InStream;
+    begin
+        Rec.Picture.CreateInStream(BlobObj);
+        if BlobObj.Length > 0 then
+            Rec.Media.ImportStream(BlobObj, 'Demo image for item');
     end;
 
     internal procedure AssistEdit(OldExample: Record "Lunch Item"): Boolean
