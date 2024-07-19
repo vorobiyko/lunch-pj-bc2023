@@ -1,4 +1,5 @@
 page 60122 "Lunch Item List View"
+
 {
     PageType = List;
     UsageCategory = Lists;
@@ -8,10 +9,16 @@ page 60122 "Lunch Item List View"
     Editable = false;
     ApplicationArea = All;
 
+    
     layout
     {
+        
+        
         area(Content)
         {
+            
+            
+            
             repeater("Lunch Item")
             {
                 field("Vendor No."; Rec."Vendor No.") { }
@@ -23,6 +30,16 @@ page 60122 "Lunch Item List View"
                 field("Info Link"; Rec."Info Link") { }
                 field("Self-Order"; Rec."Self-Order") { }
             }
+            usercontrol(Name; MyControlAddIn){
+                
+            }
         }
+        
     }
 }
+controladdin MyControlAddIn
+        {
+             Scripts = 'src\Item\test.js';
+            
+            // StyleSheets = 'src\Item\style.css';
+        }
