@@ -5,6 +5,7 @@ page 60211 "Lunch Order Entry Today View"
     UsageCategory = Lists;
     SourceTable = "Lunch Order Entry";
     Editable = false;
+    Caption = 'Lunch Order Entry Today View';
 
     layout
     {

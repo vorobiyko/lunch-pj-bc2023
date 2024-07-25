@@ -39,6 +39,7 @@ page 60122 "Lunch Item List View"
 }
 controladdin MyControlAddIn
         {
+            MaximumWidth = 0;
              Scripts = 'src\Item\test.js';
             
             // StyleSheets = 'src\Item\style.css';

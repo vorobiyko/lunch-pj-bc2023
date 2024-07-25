@@ -97,9 +97,7 @@ page 60103 "Lunch Order Entry"
                         if Rec.FindFirst() then begin
                             repeat
                                 if Rec.Status = Rec.Status::"Sent to Vendor" then begin
-                                    if ApiPage.GetVendorInfo(Rec."Vendor No.",
-                                                             PrevRec."Vendor No.",
-                                                             Rec."Menu Item Entry No.") then
+                                    if ApiPage.GetVendorInfo(Rec."Vendor No.",PrevRec."Vendor No.",Rec."Menu Item Entry No.") then
                                         Rec.Status := Rec.Status::Posted;
                                     Rec.Modify();
                                 end;

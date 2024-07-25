@@ -57,11 +57,13 @@ table 60102 "Lunch Menu"
         {
             Caption = 'Weight';
             DataClassification = CustomerContent;
+            DecimalPlaces = 1:2;
         }
         field(7; "Price"; Decimal)
         {
             Caption = 'Price';
             DataClassification = CustomerContent;
+            DecimalPlaces = 1:2;
         }
         field(8; "Indentation"; Integer)
         {
@@ -92,6 +94,7 @@ table 60102 "Lunch Menu"
         {
             DataClassification = CustomerContent;
             Caption = 'Order Amount';
+            DecimalPlaces = 1:2;
         }
         field(13; "Line Type"; Option)
         {
@@ -104,12 +107,14 @@ table 60102 "Lunch Menu"
             Caption = 'Previous Quantity';
             FieldClass = FlowField;
             MinValue = 0;
+            Editable = false;
             CalcFormula = Sum("Lunch Order Entry".Quantity WHERE("Menu Item Entry No." = FIELD("Menu Item Entry No.")));
         }
         field(15; "Self-Order"; Boolean)
         {
             Caption = 'Self-Order';
             FieldClass = FlowField;
+            Editable = false;
             CalcFormula = Lookup("Lunch Item"."Self-Order" WHERE("Item No." = FIELD("Item No.")));
         }
         field(16; "Parent Menu Item Entry No."; Integer)
@@ -330,9 +335,8 @@ table 60102 "Lunch Menu"
             SetLineNoGroup(ExRecLocal);
         end else begin
             repeat
-                if Rec."Parent Menu Item Entry No." = ExRecLocal."Menu Item Entry No." then begin
+                if Rec."Parent Menu Item Entry No." = ExRecLocal."Menu Item Entry No." then 
                     SetLineNoItem(CurrentGroupLineNo,ExRecLocal,ExRecFunc);
-                end;
             until ExRecLocal.Next() = 0;
         end;
     end;
@@ -477,9 +481,8 @@ table 60102 "Lunch Menu"
             repeat
                 if ExLunchMenu.CheckGroupHandler() = false then begin
                     if IsNotEmpty then begin
-                        if IsRecExistOrderEntry then begin
+                        if IsRecExistOrderEntry then 
                             IsRecExistOrderEntry := false;
-                        end;
                         if (ExOrderEntryLoop.FindSet()) then begin
                             repeat
                                 if ((ExLunchMenu."Menu Item Entry No." = ExOrderEntryLoop."Menu Item Entry No.")) then begin

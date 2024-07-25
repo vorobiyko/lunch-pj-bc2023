@@ -3,6 +3,7 @@ page 60212 "Item Image View"
     PageType = ListPart;
     SourceTable = "Lunch Item";
     PopulateAllFields = true;
+    Caption = 'Item Image View';
 
     layout
     {

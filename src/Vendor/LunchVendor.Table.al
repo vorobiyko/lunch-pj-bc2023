@@ -52,11 +52,7 @@ table 60104 "Lunch Vendor"
         if "Vendor No." = '' then begin
             VendorSetup.Get();
             VendorSetup.TestField("Vendor Nos.");
-            NoSeriesManagement.InitSeries("VendorSetup"."Vendor Nos.",
-                                        xRec."No. Series",
-                                        0D,
-                                        "Vendor No.",
-                                        "No. Series");
+            NoSeriesManagement.InitSeries("VendorSetup"."Vendor Nos.",xRec."No. Series",0D,"Vendor No.","No. Series");
         end;
     end;
 
@@ -67,9 +63,7 @@ table 60104 "Lunch Vendor"
         "Lunch Vendor" := Rec;
         VendorSetup.Get();
         VendorSetup.TestField("Vendor Nos.");
-        if NoSeriesManagement.SelectSeries(VendorSetup."Vendor Nos.",
-                                        OldExample."No. Series",
-                                        "Lunch Vendor"."No. Series") then begin
+        if NoSeriesManagement.SelectSeries(VendorSetup."Vendor Nos.",OldExample."No. Series","Lunch Vendor"."No. Series") then begin
             NoSeriesManagement.SetSeries("Lunch Vendor"."Vendor No.");
             Rec := "Lunch Vendor";
             exit(true);

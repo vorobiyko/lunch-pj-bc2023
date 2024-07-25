@@ -33,16 +33,14 @@ page 60213 "Lunch Menu Today View"
     trigger OnOpenPage()
     begin
         Rec.SetCurrentKey("Line No.");
-        Rec.SetFilter("Menu Date", '=%1', System.Today());
+        Rec.SetRange("Menu Date", Today);
     end;
 
     trigger OnAfterGetRecord()
-    var
-        ExRecStatus: Record "Lunch Menu";
+   
     begin
-        ExRecStatus := Rec;
-        case ExRecStatus."Line Type" of
-            ExRecStatus."Line Type"::"Group":
+        case Rec."Line Type" of
+            Rec."Line Type"::"Group":
                 begin
                     TypeControl := 'Strong';
                 end else begin

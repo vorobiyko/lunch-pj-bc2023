@@ -45,16 +45,19 @@ table 60103 "Lunch Order Entry"
         {
             DataClassification = CustomerContent;
             Caption = 'Quantity';
+            DecimalPlaces = 0;
         }
         field(9; "Price"; Decimal)
         {
             DataClassification = CustomerContent;
             Caption = 'Price';
+            DecimalPlaces = 1:2;
         }
         field(10; Amount; Decimal)
         {
             DataClassification = CustomerContent;
             Caption = 'Amount'; 
+            DecimalPlaces = 1:2;
         }
         field(11; Status; Option)
         {
@@ -82,11 +85,7 @@ table 60103 "Lunch Order Entry"
         repeat
             if (SelectedRec.Quantity <> 0) then begin
                 if SelectedRec.Status= SelectedRec.Status::Created then begin
-                    if ApiPage.PostVendorInfo(SelectedRec."Vendor No.",
-                                              SelectedRec."Menu Item No.",
-                                              SelectedRec.Quantity,
-                                              SelectedRec."Order Date",
-                                              SelectedRec."Menu Item Entry No.") then
+                    if ApiPage.PostVendorInfo(SelectedRec."Vendor No.",SelectedRec."Menu Item No.",SelectedRec.Quantity,SelectedRec."Order Date",SelectedRec."Menu Item Entry No.") then
                             SelectedRec.Status:= SelectedRec.Status::"Sent to Vendor";
                             SelectedRec.Modify();
                     end else begin

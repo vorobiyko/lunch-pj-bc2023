@@ -216,7 +216,7 @@ page 60102 "Lunch Menu View"
             LastRecLunch.FindLast();
             StartDate := System.Today;
             EndDate := StartDate + 1;
-            Rec.SetFilter("Menu Date", '%1..%2', StartDate, EndDate);
+            Rec.SetRange("Menu Date", StartDate, EndDate);
         end;
     end;
     local procedure GroupContol(var LunchMenuRecord: Record "Lunch Menu"): Text;

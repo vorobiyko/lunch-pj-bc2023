@@ -36,17 +36,14 @@ page 60109 "Vendor API"
             AttributeObj.Get('MenuItemEntryNo', MenuItemEntryNoRes);
             StatusApprove := ApprovedRes.AsValue().AsBoolean();
             MenuItemEntryNoValue := MenuItemEntryNoRes.AsValue().AsText();
-            if Format(MenuItemEntryNo) = MenuItemEntryNoValue then begin
+            if Format(MenuItemEntryNo) = MenuItemEntryNoValue then
                 exit(StatusApprove);
-            end;
             Iterator := Iterator + 1;
         until Iterator = DataObj.Count();
         exit(false);
     end;
 
-    internal procedure GetVendorInfo(var VendorNo: Code[20];
-                                         PrevVendor: Code[20];
-                                         MenuItemEntryNo: Integer): Boolean;
+    internal procedure GetVendorInfo(var VendorNo: Code[20]; PrevVendor: Code[20];MenuItemEntryNo: Integer): Boolean;
     var
         Client: HttpClient;
         RequestMessage: HttpRequestMessage;
@@ -64,9 +61,8 @@ page 60109 "Vendor API"
         RequestMessage.SetRequestUri('http://localhost:1337/api/' + EndPoint);
         RequestMessage.GetHeaders(Headers);
         Headers.Add('Authorization', 'Bearer ' + BearerToken);
-        if PrevVendor = VendorNo then begin
+        if PrevVendor = VendorNo then
             exit(JSONParser(JSONDATA, MenuItemEntryNo));
-        end;
         if Client.Send(RequestMessage, ResponseMessage) then begin
             if ResponseMessage.IsSuccessStatusCode then begin
                 ResponseMessage.Content.ReadAs(ResponseText);
@@ -84,11 +80,7 @@ page 60109 "Vendor API"
     end;
 
 
-    internal procedure PostVendorInfo(var VendorNo: Code[20];
-                                          ItemNo: Code[20];
-                                          Quantity: Decimal;
-                                          OrderDate: Date;
-                                          MenuItemEntryNo: Integer): Boolean
+    internal procedure PostVendorInfo(var VendorNo: Code[20];ItemNo: Code[20];Quantity: Decimal;OrderDate: Date;MenuItemEntryNo: Integer): Boolean
     var
         Client: HttpClient;
         RequestMessage: HttpRequestMessage;
@@ -137,6 +129,7 @@ page 60109 "Vendor API"
 
     local procedure ChoiceVendorEndpoint(var VendorCode: Code[20]): Text
     var
+        ErrLabel: Label 'Not found Vendor Code';
         PuzHat: Code[20];
         MacDon: Code[20];
         KFC: Code[20];
@@ -158,16 +151,21 @@ page 60109 "Vendor API"
         KFCEndpoint := 'kfc-vens';
         MUSEndpoint := 'mus-vens';
         MMEndpoint := 'mm-vens';
-        if VendorCode = PuzHat then
-            exit(PHEndpoint);
-        if VendorCode = MacDon then
-            exit(MCEndpoint);
-        if VendorCode = KFC then
-            exit(KFCEndpoint);
-        if VendorCode = Mus then
-            exit(MUSEndpoint);
-        if VendorCode = MamMan then
-            exit(MMEndpoint);
+        
+        case VendorCode of
+            PuzHat:
+                exit(PHEndpoint);
+            MacDon:
+                exit(MCEndpoint);
+            KFC:
+                exit(KFCEndpoint);
+            Mus:
+                exit(MUSEndpoint);
+            MamMan:
+                exit(MMEndpoint);
+        else
+            Error(ErrLabel);
+        end;
     end;
 }
 // {

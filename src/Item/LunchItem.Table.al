@@ -31,11 +31,13 @@ table 60101 "Lunch Item"
             DataClassification = CustomerContent;
             Caption = 'Weight';
             MinValue = 0;
+            DecimalPlaces = 1:2;
         }
         field(5; Price; Decimal)
         {
             DataClassification = CustomerContent;
             Caption = 'Price';
+            DecimalPlaces = 1:2;
         }
         field(6; Picture; Blob)
         {
@@ -91,11 +93,7 @@ table 60101 "Lunch Item"
         if "Item No." = '' then begin
             ItemSetup.Get();
             ItemSetup.TestField("Item Nos.");
-            NoSeriesManagement.InitSeries("ItemSetup"."Item Nos.",
-                                        xRec."No. Series",
-                                        0D,
-                                        "Item No.",
-                                        "No. Series");
+            NoSeriesManagement.InitSeries("ItemSetup"."Item Nos.",xRec."No. Series",0D,"Item No.","No. Series");
         end;
         Rec.Picture.CreateInStream(BlobObj);
         if BlobObj.Length > 0 then
@@ -118,9 +116,7 @@ table 60101 "Lunch Item"
         "Lunch Item" := Rec;
         ItemSetup.Get();
         ItemSetup.TestField("Item Nos.");
-        if NoSeriesManagement.SelectSeries(ItemSetup."Item Nos.",
-                                        OldExample."No. Series",
-                                        "Lunch Item"."No. Series") then begin
+        if NoSeriesManagement.SelectSeries(ItemSetup."Item Nos.",OldExample."No. Series","Lunch Item"."No. Series") then begin
             NoSeriesManagement.SetSeries("Lunch Item"."Item No.");
             Rec := "Lunch Item";
             exit(true);

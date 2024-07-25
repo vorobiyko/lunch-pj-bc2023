@@ -1,6 +1,7 @@
 page 60208 "Role Center Admin"
 {
     PageType = RoleCenter;
+    Caption = 'Role Center Admin';
     
     layout
     {

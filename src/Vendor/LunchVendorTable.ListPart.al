@@ -5,6 +5,7 @@ page 60210 "Vendor View"
     UsageCategory = Lists;
     SourceTable = "Lunch Vendor";
     Editable = false;
+    Caption = 'Vendor View';
 
     layout
     {

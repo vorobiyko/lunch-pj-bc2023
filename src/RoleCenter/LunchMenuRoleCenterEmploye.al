@@ -2,6 +2,7 @@ page 60209 "Role Center Employe"
 {
     PageType = RoleCenter;
     ApplicationArea = all;
+    Caption = 'Role Center Employe';
 
     layout
     {
