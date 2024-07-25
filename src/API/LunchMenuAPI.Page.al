@@ -9,6 +9,7 @@ page 60109 "Vendor API"
         LabelStatusCode: Label 'Error: %1 %2';
         LabelReq: Label 'Failed to send request';
         LabelSuccessPost: Label 'Record %1 has been sent to Vendor';
+        TokenStorage: Codeunit IsolatedStorage;
         
     local procedure JSONParser(var JSON: JsonObject; MenuItemEntryNo: Integer): Boolean
     var
@@ -56,7 +57,7 @@ page 60109 "Vendor API"
 
     begin
         EndPoint := ChoiceVendorEndpoint(VendorNo);
-        BearerToken := 'c91ddce1839bdb9f28c7893b3a6d50549174622bd69d4bde44324ef9602a71d220958b736392735efc9a1693f358ece54ed354e18bfde860a1c5d7b0cb44cb3f697519d66ddcca4cc2062cbbdd390ee80cbbc503a35f799f1f84dd2dc417ce6cd89c98487743158270e84df5d05b120e6d35b69949ce432844b4f1197bb45133';
+        BearerToken:= TokenStorage.GetTokenAPI();
         RequestMessage.Method := 'GET';
         RequestMessage.SetRequestUri('http://localhost:1337/api/' + EndPoint);
         RequestMessage.GetHeaders(Headers);
@@ -96,7 +97,7 @@ page 60109 "Vendor API"
         EndPoint: Text;
     begin
         EndPoint := ChoiceVendorEndpoint(VendorNo);
-        BearerToken := 'c91ddce1839bdb9f28c7893b3a6d50549174622bd69d4bde44324ef9602a71d220958b736392735efc9a1693f358ece54ed354e18bfde860a1c5d7b0cb44cb3f697519d66ddcca4cc2062cbbdd390ee80cbbc503a35f799f1f84dd2dc417ce6cd89c98487743158270e84df5d05b120e6d35b69949ce432844b4f1197bb45133';
+        BearerToken:= TokenStorage.GetTokenAPI();
         JSONDataText := '{"data":{"OrderDate":' + '"' + Format(OrderDate, 0, '<Year4>-<Month,2>-<Day,2>') + '"' + ',"ItemCode":' + '"' + Format(ItemNo) + '"' + ',"Quantity":' + Format(Quantity) + ',"Approved": false,"MenuItemEntryNo":' + '"' + Format(MenuItemEntryNo) + '"' + '}}';
         RequestMessage.Method := 'POST';
         RequestMessage.SetRequestUri('http://localhost:1337/api/' + EndPoint);
